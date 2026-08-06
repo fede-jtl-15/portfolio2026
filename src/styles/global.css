@@ -1,0 +1,652 @@
+/* ==========================================================================
+   Tokens
+   ========================================================================== */
+
+:root {
+  --paper: #dddfd7;
+  --paper-lift: #e6e8e1;
+  --ink: #16191b;
+  --ink-soft: #6a706a;
+  --ink-faint: #9aa096;
+  --rule: rgba(22, 25, 27, 0.14);
+  --rule-strong: rgba(22, 25, 27, 0.3);
+
+  /* The offset block that sits behind images. */
+  --block: #f2b9bd;
+
+  /* Overwritten per section by an inline style on .section / .piece */
+  --from: #e2379b;
+  --to: #ff7a5c;
+
+  --mono: 'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --gutter: clamp(1.25rem, 5vw, 5rem);
+  --measure: 62ch;
+  --stack: clamp(4rem, 12vw, 9rem);
+  --ease: cubic-bezier(0.19, 0.86, 0.28, 1);
+}
+
+/* ==========================================================================
+   Base — everything is monospace, everything is lowercase.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  font-weight: 300;
+  line-height: 1.95;
+  letter-spacing: 0.01em;
+  -webkit-font-smoothing: antialiased;
+}
+
+img,
+video,
+iframe {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--mono);
+  font-weight: 300;
+  margin: 0;
+  line-height: 1.2;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 1px solid var(--ink);
+  outline-offset: 4px;
+}
+
+::selection {
+  background: var(--block);
+  color: var(--ink);
+}
+
+/* Parenthetical asides — the recurring metadata gesture. */
+.aside {
+  font-style: italic;
+  color: var(--ink-faint);
+  font-size: 0.8125rem;
+}
+
+.shell {
+  max-width: 84rem;
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: var(--gutter);
+  top: 1rem;
+  z-index: 20;
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.5rem 0.75rem;
+}
+
+/* ==========================================================================
+   Masthead — slash-delimited, italic, quiet.
+   ========================================================================== */
+
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 2.5rem;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-block: 2rem 0;
+}
+
+.masthead__name {
+  font-style: italic;
+  font-size: 0.9375rem;
+}
+
+.masthead nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.35rem;
+  font-style: italic;
+  font-size: 0.8125rem;
+}
+
+.masthead nav a {
+  color: var(--ink-soft);
+  transition: color 0.3s var(--ease);
+  padding-block: 0.15rem;
+}
+
+.masthead nav span {
+  color: var(--ink-faint);
+}
+
+.masthead nav a:hover,
+.masthead nav a[aria-current='page'] {
+  color: var(--ink);
+}
+
+.colophon {
+  margin-top: var(--stack);
+  padding-block: 2rem 4rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 2rem;
+  justify-content: space-between;
+  font-style: italic;
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+
+.colophon a:hover {
+  color: var(--ink);
+}
+
+/* ==========================================================================
+   Gradient field — the loud gesture. A saturated two-stop gradient under a
+   fine dither grid, with text glowing through it.
+   ========================================================================== */
+
+.field {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(168deg, var(--from) 0%, var(--to) 100%);
+  isolation: isolate;
+}
+
+/* The dither: a 2px grid of light and dark lines blended into the gradient,
+   so it reads as a printed halftone rather than a plain CSS gradient. */
+.field::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.24) 0 1px, transparent 1px 2px),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.16) 0 1px, transparent 1px 2px);
+  mix-blend-mode: overlay;
+}
+
+.field__text {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  font-size: clamp(1.25rem, 0.7rem + 2.4vw, 2.25rem);
+  letter-spacing: 0.02em;
+  text-shadow:
+    0 0 14px rgba(255, 255, 255, 0.85),
+    0 0 44px rgba(255, 255, 255, 0.5);
+}
+
+/* ==========================================================================
+   Opening — content sits low and left, upper right stays empty.
+   ========================================================================== */
+
+.opener {
+  min-height: 62vh;
+  display: grid;
+  align-content: end;
+  padding-block: clamp(4rem, 14vw, 9rem) clamp(3rem, 8vw, 5rem);
+  max-width: 52rem;
+}
+
+.opener__hero {
+  aspect-ratio: 21 / 8;
+  display: grid;
+  place-items: center;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  max-width: 40rem;
+}
+
+.opener h1 {
+  font-style: italic;
+  font-size: clamp(1.5rem, 0.9rem + 2.6vw, 2.75rem);
+  letter-spacing: 0.01em;
+}
+
+.opener p {
+  margin: 1.25rem 0 0;
+  max-width: var(--measure);
+  color: var(--ink-soft);
+}
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+
+.section {
+  padding-top: var(--stack);
+  scroll-margin-top: 2rem;
+}
+
+.section__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
+.section__n {
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+.section__title {
+  font-style: italic;
+  font-size: clamp(1.125rem, 0.9rem + 1vw, 1.5rem);
+}
+
+.section__title:hover {
+  color: transparent;
+  background: linear-gradient(100deg, var(--from), var(--to));
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.section__note {
+  width: 100%;
+  margin: 0;
+  color: var(--ink-faint);
+  font-size: 0.8125rem;
+}
+
+/* ==========================================================================
+   Index — one line per piece. A colour chip carries the section gradient;
+   hovering wipes that gradient across the row.
+   ========================================================================== */
+
+.index {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.entry {
+  border-bottom: 1px solid var(--rule);
+}
+
+.entry__link {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.75rem minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: 0 1.25rem;
+  padding: 1.15rem 0.75rem 1.15rem 0.5rem;
+}
+
+/* The wipe. Scales from the left edge on hover. */
+.entry__link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(95deg, var(--from), var(--to));
+  opacity: 0.14;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.55s var(--ease);
+  pointer-events: none;
+}
+
+.entry__link:hover::before,
+.entry__link:focus-visible::before {
+  transform: scaleX(1);
+}
+
+.entry__chip {
+  width: 0.75rem;
+  height: 0.75rem;
+  align-self: center;
+  background: linear-gradient(150deg, var(--from), var(--to));
+  transition: transform 0.45s var(--ease);
+}
+
+.entry__link:hover .entry__chip {
+  transform: scale(1.35);
+}
+
+.entry__title {
+  position: relative;
+  font-style: italic;
+  font-size: clamp(1rem, 0.85rem + 0.8vw, 1.375rem);
+  letter-spacing: 0.005em;
+}
+
+.entry__wip {
+  font-style: normal;
+  font-size: 0.625rem;
+  color: var(--ink-faint);
+  margin-left: 0.6rem;
+  vertical-align: 0.15em;
+}
+
+.entry__meta {
+  position: relative;
+  font-style: italic;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  text-align: right;
+}
+
+@media (max-width: 40rem) {
+  .entry__link {
+    grid-template-columns: 0.75rem minmax(0, 1fr);
+    row-gap: 0.15rem;
+  }
+  .entry__meta {
+    grid-column: 2;
+    text-align: left;
+  }
+}
+
+/* ==========================================================================
+   Project page
+   ========================================================================== */
+
+.piece {
+  padding-block: clamp(3rem, 9vw, 6rem) 0;
+}
+
+.piece__back {
+  font-style: italic;
+  font-size: 0.8125rem;
+  color: var(--ink-faint);
+}
+
+.piece__back:hover {
+  color: var(--ink);
+}
+
+.piece__head {
+  margin-top: clamp(3rem, 10vw, 7rem);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 2.5rem;
+}
+
+.piece__title {
+  font-style: italic;
+  font-size: clamp(1.75rem, 1rem + 3.4vw, 3.25rem);
+  letter-spacing: 0.005em;
+}
+
+.piece__kind {
+  width: 100%;
+  margin: 0.25rem 0 0;
+  font-style: italic;
+  color: var(--ink-soft);
+  font-size: 0.875rem;
+}
+
+.piece__blurb {
+  margin: 2rem 0 0;
+  max-width: var(--measure);
+  color: var(--ink-soft);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 3rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  font-size: 0.8125rem;
+}
+
+.facts div {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.facts dt {
+  color: var(--ink-faint);
+  font-style: italic;
+}
+
+.facts dd {
+  margin: 0;
+}
+
+.piece__body {
+  max-width: var(--measure);
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  color: var(--ink-soft);
+}
+
+.piece__body p {
+  margin: 0 0 1.4em;
+}
+
+.piece__body a {
+  box-shadow: inset 0 -1px 0 var(--rule-strong);
+}
+
+.piece__body a:hover {
+  box-shadow: inset 0 -1px 0 var(--ink);
+}
+
+.piece__body h2 {
+  font-style: italic;
+  font-size: 1rem;
+  color: var(--ink);
+  margin: 2.5rem 0 1rem;
+}
+
+/* ==========================================================================
+   Media — every item sits offset from a flat colour block, the way the pink
+   square sat behind images on the old site.
+   ========================================================================== */
+
+.media {
+  margin-top: clamp(3rem, 8vw, 5rem);
+  display: grid;
+  gap: clamp(3rem, 8vw, 5.5rem);
+}
+
+.media figure {
+  position: relative;
+  margin: 0;
+  max-width: 54rem;
+}
+
+/* The offset block, behind and above-left of the media itself. */
+.media figure::before {
+  content: '';
+  position: absolute;
+  left: -1.75rem;
+  top: -1.75rem;
+  width: 6.5rem;
+  height: 4rem;
+  background: var(--block);
+  z-index: 0;
+}
+
+.media figure:nth-child(even)::before {
+  background: linear-gradient(140deg, var(--from), var(--to));
+  opacity: 0.5;
+}
+
+.frame,
+.media img,
+.sc-embed,
+.bc-embed,
+.audio {
+  position: relative;
+  z-index: 1;
+}
+
+.frame {
+  aspect-ratio: 16 / 9;
+  background: #101214;
+  overflow: hidden;
+}
+
+.frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.media figcaption {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.85rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+}
+
+.media figcaption b {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--ink);
+}
+
+.media img {
+  width: 100%;
+  height: auto;
+  background: var(--paper-lift);
+}
+
+.sc-embed,
+.bc-embed {
+  border: 0;
+  width: 100%;
+}
+
+.sc-embed {
+  height: 140px;
+}
+
+.bc-embed {
+  height: 120px;
+  background: #101214;
+}
+
+.audio {
+  background: var(--paper-lift);
+  padding: 1rem;
+}
+
+.audio audio {
+  width: 100%;
+}
+
+@media (max-width: 40rem) {
+  .media figure::before {
+    left: -0.75rem;
+    top: -0.75rem;
+    width: 4rem;
+    height: 2.5rem;
+  }
+}
+
+/* ==========================================================================
+   About
+   ========================================================================== */
+
+.about {
+  padding-block: clamp(3rem, 9vw, 6rem) 0;
+  display: grid;
+  gap: clamp(2.5rem, 7vw, 5rem);
+}
+
+@media (min-width: 56rem) {
+  .about {
+    grid-template-columns: minmax(0, 1.4fr) minmax(12rem, 0.6fr);
+    align-items: start;
+  }
+}
+
+.about__bio {
+  max-width: var(--measure);
+}
+
+.about__bio h1 {
+  font-style: italic;
+  font-size: clamp(1.75rem, 1rem + 3vw, 2.75rem);
+  margin-bottom: 2rem;
+}
+
+.about__bio p {
+  margin: 0 0 1.4em;
+  color: var(--ink-soft);
+}
+
+.card {
+  margin-bottom: 2.5rem;
+}
+
+.card > p {
+  margin: 0 0 0.75rem;
+  font-style: italic;
+  color: var(--ink-faint);
+  font-size: 0.8125rem;
+}
+
+.card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.card a {
+  box-shadow: inset 0 -1px 0 var(--rule-strong);
+}
+
+.card a:hover {
+  box-shadow: inset 0 -1px 0 var(--ink);
+}
+
+/* ==========================================================================
+   Motion preferences
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .entry__link::before {
+    transform: scaleX(1);
+    opacity: 0.07;
+  }
+}

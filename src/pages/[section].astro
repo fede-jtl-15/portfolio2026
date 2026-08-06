@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+import Index from '../components/Index.astro';
+import { SECTIONS } from '../lib/site';
+import { getWork } from '../lib/work';
+
+export async function getStaticPaths() {
+  return SECTIONS.map((s) => ({ params: { section: s.id }, props: { section: s } }));
+}
+
+const { section } = Astro.props;
+const entries = await getWork(section.id);
+---
+
+<Base title={section.label} description={section.note}>
+  <div style={`--from:${section.from}; --to:${section.to};`}>
+    <section class="opener">
+      <div class="opener__hero field">
+        <span class="field__text">{section.label}</span>
+      </div>
+      <h1>
+        {section.label} <span class="aside">{section.aside}</span>
+      </h1>
+      <p>{section.note}</p>
+    </section>
+
+    <Index entries={entries} />
+  </div>
+</Base>

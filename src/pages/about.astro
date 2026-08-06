@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE, SOCIALS } from '../lib/site';
+---
+
+<Base title="about">
+  <div class="about">
+    <div class="about__bio">
+      <h1>{SITE.name} <span class="aside">(bio)</span></h1>
+
+      <p>
+        write the short version first: where you're based, what you make, and
+        the through-line between the radio, the installations and the video
+        work.
+      </p>
+      <p>
+        then the longer version: how you got here, who you work with regularly,
+        and what you're doing at the moment. keep it to something a promoter
+        could paste into a listing without editing it.
+      </p>
+    </div>
+
+    <aside>
+      <section class="card">
+        <p>(contact)</p>
+        <ul>
+          <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <p>(elsewhere)</p>
+        <ul>
+          {
+            SOCIALS.map((s) => (
+              <li>
+                <a href={s.href} rel="me noopener" target="_blank">
+                  {s.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+    </aside>
+  </div>
+</Base>

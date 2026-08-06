@@ -1,0 +1,47 @@
+---
+import Base from '../layouts/Base.astro';
+import Index from '../components/Index.astro';
+import { SECTIONS, SITE } from '../lib/site';
+import { getWork } from '../lib/work';
+
+const grouped = await Promise.all(
+  SECTIONS.map(async (s) => ({ section: s, entries: await getWork(s.id) })),
+);
+
+const [first, last] = SITE.name.split(' ');
+---
+
+<Base>
+  <section class="opener">
+    <div class="opener__hero field" style="--from:#2fc46a; --to:#e2379b;">
+      <span class="field__text">{first}&nbsp;&nbsp;{last}</span>
+    </div>
+
+    <h1>{SITE.role} <span class="aside">(2019—)</span></h1>
+    <p>
+      {/* Replace this with two or three sentences in your own voice. */}
+      radio, live sets, installations and video. made with musicians, and made
+      alone in rooms.
+    </p>
+  </section>
+
+  {
+    grouped.map(({ section, entries }) => (
+      <section
+        class="section"
+        id={section.id}
+        style={`--from:${section.from}; --to:${section.to};`}
+      >
+        <div class="section__head">
+          <span class="section__n">{section.n}</span>
+          <h2 class="section__title">
+            <a href={`/${section.id}`}>{section.label}</a>
+          </h2>
+          <span class="aside">{section.aside}</span>
+          <p class="section__note">{section.note}</p>
+        </div>
+        <Index entries={entries} />
+      </section>
+    ))
+  }
+</Base>

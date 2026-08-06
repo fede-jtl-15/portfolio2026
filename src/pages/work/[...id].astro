@@ -1,0 +1,53 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Media from '../../components/Media.astro';
+import { sectionById } from '../../lib/site';
+import { getWork } from '../../lib/work';
+
+export async function getStaticPaths() {
+  const entries = await getWork();
+  return entries.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const section = sectionById(entry.data.section);
+const { title, year, format, credits, blurb, media, wip } = entry.data;
+---
+
+<Base title={title} description={blurb}>
+  <article class="piece" style={`--from:${section.from}; --to:${section.to};`}>
+    <a class="piece__back" href={`/${section.id}`}>← {section.label}</a>
+
+    <header class="piece__head">
+      <h1 class="piece__title">{title}</h1>
+      {wip && <span class="aside">(on-going)</span>}
+      {!wip && year && <span class="aside">({year})</span>}
+      {format && <p class="piece__kind">{format}</p>}
+    </header>
+
+    {blurb && <p class="piece__blurb">{blurb}</p>}
+
+    <dl class="facts">
+      {year && (
+        <div>
+          <dt>year</dt>
+          <dd>{year}</dd>
+        </div>
+      )}
+      {credits.length > 0 && (
+        <div>
+          <dt>with</dt>
+          <dd>{credits.join(', ')}</dd>
+        </div>
+      )}
+    </dl>
+
+    <Media items={media} />
+
+    <div class="piece__body">
+      <Content />
+    </div>
+  </article>
+</Base>
