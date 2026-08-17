@@ -20,6 +20,11 @@ public/images/**/strip/
 # disk, just not worth committing; ask before deleting it outright.
 public/images/proyectos/_landing_2/
 
+# Retired/superseded assets (old PSDs, replaced home-page concepts) — not
+# referenced by any current page/component. Kept on disk as an archive,
+# just not worth committing (407MB).
+public/images/ignore/
+
 # Leftover from the deleted /idea-2 draft homepage (idea_landing_2.mp4) and
 # an old unused tr33 reference clip (tr33.mp4) — neither is referenced by
 # any current page/component. Kept on disk, not worth committing.
