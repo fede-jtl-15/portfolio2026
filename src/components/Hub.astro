@@ -16,9 +16,10 @@ import { getPieceText } from '../lib/piece-text';
 // submenu next to it is conditional, so every page states what project
 // it's on, hub or not.
 //
-// Assets come from public/images/proyectos/<folder>/<piece slug>/ for a
-// real multi-piece hub, or straight from public/images/proyectos/<folder>/
-// for a standalone piece (no extra nesting on disk). A piece's slug
+// Assets come from assets/<folder>/<piece slug>/ for a real multi-piece
+// hub, or straight from assets/<folder>/ for a standalone piece (no extra
+// nesting on disk) — see the longer note in src/lib/hub-assets.ts for why
+// sources live under assets/ rather than public/images/. A piece's slug
 // defaults to its id with the "<entryId>-" prefix stripped and dashes
 // turned to underscores (matching the source folders' own naming) — pass
 // `folderOverrides` for the handful whose folder name doesn't follow that

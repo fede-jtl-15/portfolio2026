@@ -6,14 +6,16 @@ import { sectionById, type SectionId } from './site';
 import { isCacheFresh, recordCacheFresh } from './fingerprint';
 
 /**
- * Home page filmstrip, sourced directly from public/images/proyectos — drop
- * a new image into one of the four category folders and it shows up on the
- * next dev-server request or build, no code changes needed.
+ * Home page filmstrip, sourced directly from assets/ — drop a new image
+ * into one of the four category folders and it shows up on the next
+ * dev-server request or build, no code changes needed.
  *
  * Each source image is compressed into public/images/proyectos/strip/ the
  * first time it's seen, and re-compressed if the source is ever replaced
  * (same filename, new content — see src/lib/fingerprint.ts) — since the
- * originals can be many MB and are shown here as small stills.
+ * originals can be many MB and are shown here as small stills. Sourced from
+ * assets/ rather than public/images/ so the (much larger) originals never
+ * end up in the deploy output — see the longer note in hub-assets.ts.
  *
  * Title/link: if the filename matches a src/content/work/*.md entry (exactly,
  * loosely, or as a "<id>-something" series like the reflected-radio photos),
@@ -28,8 +30,8 @@ const CATEGORY_SECTION: Record<string, SectionId> = {
   sound: 'sound',
 };
 
-const PROYECTOS_DIR = path.join(process.cwd(), 'public/images/proyectos');
-const STRIP_DIR = path.join(PROYECTOS_DIR, 'strip');
+const SOURCE_DIR = path.join(process.cwd(), 'assets');
+const STRIP_DIR = path.join(process.cwd(), 'public/images/proyectos/strip');
 const IMAGE_RE = /\.(jpe?g|png)$/i;
 
 function slugify(name: string) {
@@ -75,7 +77,7 @@ export interface StripImage {
 }
 
 export async function getStripImages(): Promise<StripImage[]> {
-  if (!existsSync(PROYECTOS_DIR)) return [];
+  if (!existsSync(SOURCE_DIR)) return [];
   mkdirSync(STRIP_DIR, { recursive: true });
 
   const work = await getCollection('work', ({ data }) => !data.draft);
@@ -83,7 +85,7 @@ export async function getStripImages(): Promise<StripImage[]> {
   const results: StripImage[] = [];
 
   for (const [category, sectionId] of Object.entries(CATEGORY_SECTION)) {
-    const dir = path.join(PROYECTOS_DIR, category);
+    const dir = path.join(SOURCE_DIR, category);
     if (!existsSync(dir)) continue;
 
     const files = readdirSync(dir).filter((f) => IMAGE_RE.test(f));

@@ -30,17 +30,30 @@ public/images/ignore/
 # any current page/component. Kept on disk, not worth committing.
 public/videos/
 
-# Videos are hosted on Cloudflare R2 instead of git — GitHub hard-blocks any
-# single file over 100MB, and this project's source footage regularly runs
-# past that (several 200MB+ reels). See src/lib/r2-media.ts and
+# All videos are hosted on Cloudflare R2 instead of git — GitHub hard-blocks
+# any single file over 100MB, and this project's source footage regularly
+# exceeds that (several 200MB+ reels). See src/lib/r2-media.ts and
 # scripts/migrate-videos-to-r2.mjs — run that script after adding a new
 # video so it gets uploaded and added to src/data/r2-media.json.
-public/images/proyectos/**/*.mp4
-public/images/proyectos/**/*.mov
-public/images/proyectos/**/*.m4v
-public/images/proyectos/**/*.webm
-public/images/proyectos/audiovisual/tres_islas/Caricias_Video_IG_V2.gif
+assets/**/*.mp4
+assets/**/*.mov
+assets/**/*.m4v
+assets/**/*.webm
 public/images/home/*.mp4
 public/images/home/*.mov
 public/images/home/*.m4v
 public/images/home/*.webm
+
+# Gifs over GIF_COMPRESS_MAX_BYTES (8MB, see src/lib/hub-assets.ts) skip
+# local recompression and are hosted on R2 too — effectively a video
+# wearing a gif extension. Listed explicitly (not a size-based glob, since
+# gitignore can't match by file size) — scripts/migrate-videos-to-r2.mjs
+# uses the same 8MB threshold, so re-run it and add the new path here after
+# dropping in another gif that large.
+assets/audiovisual/eliangel/mi vibe/Mi_vibe_Final_v2.gif
+assets/audiovisual/tres_islas/ambar_IG_3_v2.gif
+assets/audiovisual/tres_islas/AzaleaCanvas_v1.gif
+assets/audiovisual/tres_islas/Caricias_Video_IG_V2.gif
+assets/audiovisual/tres_islas/Chapulin_Canvas_V1.gif
+assets/audiovisual/tres_islas/PatoBlanco_Canvas_v1.gif
+assets/audiovisual/tres_islas/_Lichi_Canvas_1.gif

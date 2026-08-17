@@ -47,7 +47,7 @@ async function preparedVideo(inPath, outPath) {
 }
 
 const ROOT = process.cwd();
-const PROYECTOS_DIR = path.join(ROOT, 'public/images/proyectos');
+const PROYECTOS_DIR = path.join(ROOT, 'assets');
 const HOME_DIR = path.join(ROOT, 'public/images/home');
 const VIDEO_RE = /\.(mp4|m4v|mov|webm)$/i;
 const STAGING_DIR = path.join(ROOT, '.r2-staging');
@@ -81,6 +81,26 @@ function walkVideos(dir, baseDir, out) {
   return out;
 }
 
+// Must match GIF_COMPRESS_MAX_BYTES in src/lib/hub-assets.ts exactly — that
+// threshold is what actually decides whether hub-assets.ts skips local
+// recompression and requires an R2 entry to serve the gif at all, not
+// Cloudflare's separate (larger) 25MB deploy-output cap. A gif this size is
+// effectively a video wearing a gif extension anyway.
+const GIF_COMPRESS_MAX_BYTES = 8 * 1024 * 1024;
+
+function walkBigGifs(dir, baseDir, out) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === 'strip') continue;
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      walkBigGifs(full, baseDir, out);
+    } else if (/\.gif$/i.test(entry.name) && statSync(full).size > GIF_COMPRESS_MAX_BYTES) {
+      out.push(path.relative(baseDir, full));
+    }
+  }
+  return out;
+}
+
 const proyectosVideos = walkVideos(PROYECTOS_DIR, PROYECTOS_DIR, []).map((p) => ({
   key: `proyectos/${p.replace(/\\/g, '/')}`,
   abs: path.join(PROYECTOS_DIR, p),
@@ -89,13 +109,13 @@ const homeVideos = walkVideos(HOME_DIR, HOME_DIR, []).map((p) => ({
   key: `home/${p.replace(/\\/g, '/')}`,
   abs: path.join(HOME_DIR, p),
 }));
-const bigGif = {
-  key: 'proyectos/audiovisual/tres_islas/Caricias_Video_IG_V2.gif',
-  abs: path.join(PROYECTOS_DIR, 'audiovisual/tres_islas/Caricias_Video_IG_V2.gif'),
-};
+const bigGifs = walkBigGifs(PROYECTOS_DIR, PROYECTOS_DIR, []).map((p) => ({
+  key: `proyectos/${p.replace(/\\/g, '/')}`,
+  abs: path.join(PROYECTOS_DIR, p),
+}));
 
-const all = [...proyectosVideos, ...homeVideos, bigGif];
-console.log(`Found ${all.length} files to migrate (${proyectosVideos.length} proyectos videos, ${homeVideos.length} home videos, 1 big gif)`);
+const all = [...proyectosVideos, ...homeVideos, ...bigGifs];
+console.log(`Found ${all.length} files to migrate (${proyectosVideos.length} proyectos videos, ${homeVideos.length} home videos, ${bigGifs.length} oversized gifs)`);
 
 mkdirSync(path.dirname(MANIFEST_PATH), { recursive: true });
 const manifest = existsSync(MANIFEST_PATH) ? JSON.parse(readFileSync(MANIFEST_PATH, 'utf-8')) : {};

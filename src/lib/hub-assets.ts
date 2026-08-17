@@ -7,43 +7,46 @@ import { preparedVideo } from './video-prep';
 
 /**
  * Assets for one hub sub-project (see the `hub` field on the work
- * collection schema), read by convention from
- * public/images/proyectos/<relDir>/ — the file named "*_background.*" is
- * the background image, every other photo/gif/video in that folder is a
- * gallery item. Compressed copies of photos and gifs are cached in
- * proyectos/strip/hub/ the first time each source is seen, since originals
- * here run up to ~17MB, and regenerated whenever the source file is
- * replaced (see src/lib/fingerprint.ts) — so replacing a file (same
- * filename, new content) is picked up on the next request instead of
- * silently keeping the old compressed version forever. Videos aren't
- * recompressed (sharp only handles images) — mp4/m4v/mov ones are either
+ * collection schema), read by convention from assets/<relDir>/ — the file
+ * named "*_background.*" is the background image, every other photo/gif/
+ * video in that folder is a gallery item. Compressed copies of photos and
+ * gifs are cached in public/images/proyectos/strip/hub/ the first time each
+ * source is seen, since originals here run up to ~50MB, and regenerated
+ * whenever the source file is replaced (see src/lib/fingerprint.ts) — so
+ * replacing a file (same filename, new content) is picked up on the next
+ * request instead of silently keeping the old compressed version forever.
+ * Videos aren't recompressed (sharp only handles images) — they're either
  * remuxed or, when the codec itself isn't safely compatible, re-encoded —
  * see preparedVideo() below for why that turned out to matter.
  *
- * Videos are also too large to commit to git (GitHub hard-blocks any single
- * file over 100MB, and this project's source footage regularly exceeds
- * that) — they're hosted on Cloudflare R2 instead and served from
- * src/data/r2-media.json (see src/lib/r2-media.ts) rather than processed
- * from a local file at build time. A video already in that manifest is
- * served straight from its R2 URL, whether or not the local source is even
- * present — it won't be on a fresh CI checkout, since it's gitignored. A
- * video NOT yet in the manifest (freshly dropped in, not migrated yet)
- * still goes through the old local ffmpeg pipeline below, so it previews
- * locally immediately; it just won't appear on the deployed site until
- * scripts/migrate-videos-to-r2.mjs has been run for it.
+ * Source images/videos live under assets/ rather than public/images/ on
+ * purpose — Astro copies the entire public/ directory into the deploy
+ * output verbatim, and Cloudflare Pages hard-caps any single file there at
+ * 25MB. Several of this project's source photos/scans exceed that on their
+ * own (before any docs are even involved), so keeping raw sources outside
+ * public/ means only the already-downsized compressed copies ever ship;
+ * the originals stay build-time-only input. Videos and oversized gifs go a
+ * step further and skip git entirely — see the R2 note below.
+ *
+ * Videos (and any gif too large to recompress, effectively a video wearing
+ * a gif extension) are also too large for git outright — GitHub
+ * hard-blocks any single file over 100MB, and this project's source
+ * footage regularly exceeds that — so they're hosted on Cloudflare R2
+ * instead and served from src/data/r2-media.json (see src/lib/r2-media.ts)
+ * rather than processed from a local file at build time. An asset already
+ * in that manifest is served straight from its R2 URL, whether or not the
+ * local source is even present — it won't be on a fresh CI checkout, since
+ * it's gitignored. An asset NOT yet in the manifest (freshly dropped in,
+ * not migrated yet) still goes through the old local ffmpeg pipeline
+ * below, so it previews locally immediately; it just won't appear on the
+ * deployed site until scripts/migrate-videos-to-r2.mjs has been run for it.
  */
 
-const PROYECTOS_DIR = path.join(process.cwd(), 'public/images/proyectos');
-const CACHE_DIR = path.join(PROYECTOS_DIR, 'strip', 'hub');
+const SOURCE_DIR = path.join(process.cwd(), 'assets');
+const CACHE_DIR = path.join(process.cwd(), 'public/images/proyectos/strip/hub');
 const IMAGE_RE = /\.(jpe?g|png)$/i;
 const GIF_RE = /\.gif$/i;
 const VIDEO_RE = /\.(mp4|m4v|mov|webm)$/i;
-// mp4/mov-family containers store a "moov" atom describing how to decode
-// the file — exported at the end by some tools/cameras instead of the
-// start. A browser needs it before it can play anything, so a video like
-// that either stalls or (observed in practice) just renders blank. webm
-// (Matroska-based) doesn't have this failure mode, so it's excluded here.
-const FASTSTART_RE = /\.(mp4|m4v|mov)$/i;
 const MEDIA_RE = /\.(jpe?g|png|gif|mp4|m4v|mov|webm)$/i;
 const BACKGROUND_MAX = 1600;
 const GALLERY_MAX = 1000;
@@ -100,12 +103,8 @@ async function cachedImageDims(outPath: string, isGif: boolean): Promise<{ width
   return { width: meta.width ?? 800, height: (meta.height ?? 800) / pages };
 }
 
-function publicSrc(relDir: string, file: string): string {
-  return `/images/proyectos/${relDir}/${encodeURIComponent(file)}`;
-}
-
 export async function getHubAssets(relDir: string): Promise<HubAssets> {
-  const sourceDir = path.join(PROYECTOS_DIR, relDir);
+  const sourceDir = path.join(SOURCE_DIR, relDir);
   if (!existsSync(sourceDir)) return { background: null, gallery: [] };
   mkdirSync(CACHE_DIR, { recursive: true });
 
@@ -132,21 +131,22 @@ export async function getHubAssets(relDir: string): Promise<HubAssets> {
       // so it just falls through to the gallery like any other video.
       if (r2Entry) {
         gallery.push({ kind: 'video', src: r2Entry.url });
-      } else if (FASTSTART_RE.test(file)) {
-        const outName = `${prefix}-${safeBase}.mp4`;
-        const outPath = path.join(CACHE_DIR, outName);
-        try {
-          if (!isCacheFresh(CACHE_DIR, inPath, outName)) {
-            await preparedVideo(inPath, outPath);
-            recordCacheFresh(CACHE_DIR, inPath, outName);
-          }
-          gallery.push({ kind: 'video', src: `/images/proyectos/strip/hub/${outName}` });
-        } catch (err) {
-          console.warn(`[hub-assets] video preparation failed, linking original instead: ${inPath}`, err);
-          gallery.push({ kind: 'video', src: publicSrc(relDir, file) });
+        continue;
+      }
+      const outName = `${prefix}-${safeBase}.mp4`;
+      const outPath = path.join(CACHE_DIR, outName);
+      try {
+        if (!isCacheFresh(CACHE_DIR, inPath, outName)) {
+          await preparedVideo(inPath, outPath);
+          recordCacheFresh(CACHE_DIR, inPath, outName);
         }
-      } else {
-        gallery.push({ kind: 'video', src: publicSrc(relDir, file) });
+        gallery.push({ kind: 'video', src: `/images/proyectos/strip/hub/${outName}` });
+      } catch (err) {
+        // No public fallback to link to any more — the source lives under
+        // assets/, outside public/, precisely so it's never served as-is.
+        // Skipping (not adding a broken URL to the gallery) matches the
+        // "one bad file shouldn't break the page" behavior below.
+        console.warn(`[hub-assets] video preparation failed, skipping: ${inPath}`, err);
       }
       continue;
     }
@@ -156,7 +156,11 @@ export async function getHubAssets(relDir: string): Promise<HubAssets> {
     const outPath = path.join(CACHE_DIR, outName);
 
     if (isGif && statSync(inPath).size > GIF_COMPRESS_MAX_BYTES) {
-      const img: HubImage = { kind: 'image', src: r2Entry?.url ?? publicSrc(relDir, file), w: r2Entry?.width ?? 0, h: r2Entry?.height ?? 0 };
+      if (!r2Entry) {
+        console.warn(`[hub-assets] oversized gif not yet migrated to R2, skipping: ${inPath}`);
+        continue;
+      }
+      const img: HubImage = { kind: 'image', src: r2Entry.url, w: r2Entry.width ?? 0, h: r2Entry.height ?? 0 };
       if (isBackground) background = img;
       else gallery.push(img);
       continue;

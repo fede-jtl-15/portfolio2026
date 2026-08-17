@@ -1,5 +1,5 @@
-// Real per-episode image folders under public/images/proyectos/sound/baladi/
-// are named b1..b17 (no zero-padding), while every other convention on this
+// Real per-episode image folders under assets/sound/baladi/ are named
+// b1..b17 (no zero-padding), while every other convention on this
 // site (content ids, the b001_TEXT.txt.. files) uses the padded
 // baladi-b001..baladi-b017 — this maps one to the other for Hub's
 // folderOverrides prop, shared across every baladi-*.astro page so the
