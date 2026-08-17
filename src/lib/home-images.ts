@@ -44,10 +44,15 @@ export interface HomeVideo {
 export type HomeMedia = HomeImage | HomeVideo;
 
 export async function getHomeImages(): Promise<HomeMedia[]> {
-  if (!existsSync(HOME_DIR)) return [];
-  mkdirSync(CACHE_DIR, { recursive: true });
+  // Not an early-out for "nothing to do" — git doesn't track empty
+  // directories, so if every file ever committed here is a gitignored
+  // video, this directory won't exist at all on a fresh checkout. The R2
+  // sweep below still needs to run in that case, so this only skips the
+  // local-file scan, not the whole function.
+  const homeDirExists = existsSync(HOME_DIR);
+  if (homeDirExists) mkdirSync(CACHE_DIR, { recursive: true });
 
-  const files = readdirSync(HOME_DIR).filter((f) => MEDIA_RE.test(f));
+  const files = homeDirExists ? readdirSync(HOME_DIR).filter((f) => MEDIA_RE.test(f)) : [];
   const items: HomeMedia[] = [];
 
   for (const file of files) {

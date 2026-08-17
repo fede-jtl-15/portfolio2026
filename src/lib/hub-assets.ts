@@ -105,14 +105,19 @@ async function cachedImageDims(outPath: string, isGif: boolean): Promise<{ width
 
 export async function getHubAssets(relDir: string): Promise<HubAssets> {
   const sourceDir = path.join(SOURCE_DIR, relDir);
-  if (!existsSync(sourceDir)) return { background: null, gallery: [] };
-  mkdirSync(CACHE_DIR, { recursive: true });
+  // Not an early-out for "nothing to do" — git doesn't track empty
+  // directories, so a piece whose only assets are gitignored videos/big
+  // gifs would have no folder at all on a fresh checkout. The R2 sweep
+  // below still needs to run in that case, so this only skips the
+  // local-file scan, not the whole function.
+  const sourceDirExists = existsSync(sourceDir);
+  if (sourceDirExists) mkdirSync(CACHE_DIR, { recursive: true });
 
   const prefix = relDir
     .toLowerCase()
     .replace(/[\\/]+/g, '-')
     .replace(/[^a-z0-9-]/g, '');
-  const files = readdirSync(sourceDir).filter((f) => MEDIA_RE.test(f));
+  const files = sourceDirExists ? readdirSync(sourceDir).filter((f) => MEDIA_RE.test(f)) : [];
   const r2Media = new Map(r2VideosForProyectosDir(relDir).map(({ file, entry }) => [file, entry]));
 
   let background: HubImage | null = null;
