@@ -13,15 +13,15 @@ how can we use new media to alter how we perceive and experience the world that 
 
 Through the creation of new media, we are encouraged to alter the world and our perception of it. Perceptual adaptation is a means to gain new perspectives (George M. Stratton, Carsten Höller) — our senses are neglected automatons (Madeline Schwartzman).
 
-## body — mind — body
+body — mind — body
 
 Body image: the appearance of the body in the perceptual field. Body schema: how the body shapes the perceptual field (Shaun Gallagher). Enactive perception is a constant give and take between the perceiver's embodied actions and the environment it interacts with (Alva Noë). Perception is informed through engagement and interaction.
 
-## extensions
+extensions
 
 Where does the mind stop and the rest of the world begin? (Andy Clark & David Chalmers) Beyond the boundaries of the human body, extended schemas and the affordance of technology present an opportunity for new ways of embodiment to arise. Extended forms of embodiment afford us to reimagine what it means to be human — artistic exploration as a way to reshape how we perceive.
 
-## abstract
+abstract
 
 Vistas is an interactive performance exhibition.
 
@@ -31,7 +31,7 @@ The project invites us to experiment by combining our bodies with different tool
 
 The project aims to create a safer space where people are invited to gather, and explore their extended selves. This space functions as a place for bodies, shapes, environments and perspectives to melt, giving way to new perceptive ideas to arise.
 
-## installation
+installation
 
 The installation invites the public to explore the space by putting on different devices.
 
@@ -39,7 +39,7 @@ By using the devices, perceivers are encouraged to move freely and interact with
 
 The installation space presents an opportunity to gather, to explore different perspectives and to rethink old acquired ideas of perception and reality.
 
-## conclusion
+conclusion
 
 Perception is an active task. We constantly shape it through our experiences and our bodies' role in embodying them. Having an active role in how we unwrap ourselves in specific environments allows us to adjust our bodies, how we perceive them, and how we exist within a particular space. By actively doing this, we can gain agency of how we exist in the world, challenging the conditioned perception we are bound to because of our human nature.
 
