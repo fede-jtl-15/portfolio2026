@@ -1,4 +1,6 @@
 ---
+folder: sound/baladi
+includeHubAsPiece: true
 title: baladí
 section: sound
 order: 1
@@ -20,5 +22,5 @@ Home entry for the baladí hub — see baladi-b001.md, baladi-b002.md and
 baladi-b003.md for the individual episodes. Unlike the other hubs, this
 entry IS rendered (see includeHubAsPiece on Hub.astro): it's the "home"
 piece the kicker links back to, with its own text (sound/baladi_TEXT.txt)
-and gallery (the flat images directly in public/images/proyectos/sound/baladi/,
-not the per-episode subfolders).
+and gallery (the flat images directly in assets/sound/baladi/, not the
+per-episode subfolders).

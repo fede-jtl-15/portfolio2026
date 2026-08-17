@@ -1,4 +1,5 @@
 ---
+folder: audiovisual/dialogues
 title: dialogues
 section: av
 order: 4

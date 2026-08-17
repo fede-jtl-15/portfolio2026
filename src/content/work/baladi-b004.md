@@ -1,4 +1,5 @@
 ---
+folder: sound/baladi/b4
 title: b004
 section: sound
 hub: baladi

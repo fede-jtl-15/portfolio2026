@@ -1,15 +1,21 @@
 ---
+import { getCollection } from 'astro:content';
 import CategoryIndex, { type CategoryEntry } from '../components/CategoryIndex.astro';
 import { getStripImages } from '../lib/strip-images';
 
-// Labels and order exactly as given in public/text/installation_TEXT.txt.
-const projects = [
-  { label: 'ring / rand', href: '/work/ring-rand' },
-  { label: 'incidental', href: '/work/incidental' },
-  { label: 'vistas', href: '/work/vistas' },
-  { label: 'frente a un espejo roto', href: '/work/frente-a-un-espejo-roto' },
-  { label: 'bow.distort.warp', href: '/work/bend-distort-warp' },
-];
+// Auto-generated from the content collection — a hub's own root entry or a
+// standalone piece (never a sub-piece, which has `hub` set) whose `folder`
+// starts with "installation/" (this page's own route is /interactive, but
+// the folder convention under assets/ is "installation" — see
+// CATEGORY_SECTION in src/lib/strip-images.ts for the same naming quirk),
+// ordered by `order`. Adding a new piece here is just a matter of giving
+// its content entry a folder under installation/ — see
+// src/pages/work/[id].astro and content.config.ts.
+const work = await getCollection('work', ({ data }) => !data.draft);
+const projects = work
+  .filter((e) => !e.data.hub && e.data.folder?.startsWith('installation/'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((e) => ({ label: e.data.label ?? e.data.title, href: `/work/${e.id}` }));
 
 const allStrip = await getStripImages();
 const installationImages = allStrip.filter((img) => img.src.includes('/cache/installation-'));

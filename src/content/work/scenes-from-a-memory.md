@@ -1,4 +1,5 @@
 ---
+folder: live/scenes_from_a_memory
 title: scenes from a memory
 section: performance
 order: 1

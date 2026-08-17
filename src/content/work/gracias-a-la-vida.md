@@ -1,4 +1,5 @@
 ---
+folder: sound/gracias_a_la_vida
 title: gracias a la vida 98'
 section: sound
 order: 3

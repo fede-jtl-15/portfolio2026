@@ -1,4 +1,5 @@
 ---
+folder: installation/bend_distort_warp
 title: bow.distort.warp
 section: interactive
 order: 5

@@ -1,4 +1,5 @@
 ---
+folder: installation/incidental
 title: incidental
 section: interactive
 order: 2

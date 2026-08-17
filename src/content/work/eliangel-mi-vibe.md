@@ -1,4 +1,5 @@
 ---
+folder: audiovisual/eliangel/mi vibe
 title: mi vibe
 section: av
 hub: eliangel

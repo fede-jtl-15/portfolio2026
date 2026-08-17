@@ -21,26 +21,28 @@ import { getPieceText } from '../lib/piece-text';
 // nesting on disk) — see the longer note in src/lib/hub-assets.ts for why
 // sources live under assets/ rather than public/images/. A piece's slug
 // defaults to its id with the "<entryId>-" prefix stripped and dashes
-// turned to underscores (matching the source folders' own naming) — pass
-// `folderOverrides` for the handful whose folder name doesn't follow that
-// convention (a stray space, a typo carried over from the original
-// upload). A piece with no real gallery yet (folder missing or empty)
-// falls back to a single placeholder image rather than an empty column.
+// turned to underscores (matching the source folders' own naming) — a
+// sub-piece whose real folder doesn't follow that convention (a stray
+// space, a typo carried over from the original upload) sets its own
+// `folder` in frontmatter as a full override instead, read directly below
+// rather than passed in as a prop. A piece with no real gallery yet
+// (folder missing or empty) falls back to a single placeholder image
+// rather than an empty column.
 //
-// `includeHubAsPiece` (currently just baladí) makes the hub entry itself
-// browsable as an extra "home" piece — its own text/gallery come straight
-// from `folder` (no per-piece subfolder, no per-piece text file convention
-// to follow), and the kicker becomes a clickable button back to it,
-// alongside the real sub-pieces in the submenu.
+// `includeHubAsPiece` (currently just baladí, read from the hub's own
+// entry) makes the hub itself browsable as an extra "home" piece — its own
+// text/gallery come straight from `folder` (no per-piece subfolder, no
+// per-piece text file convention to follow), and the kicker becomes a
+// clickable button back to it, alongside the real sub-pieces in the
+// submenu.
 interface Props {
   entryId: string;
   folder: string;
-  folderOverrides?: Record<string, string>;
   initialPieceId?: string;
   includeHubAsPiece?: boolean;
 }
 
-const { entryId, folder, folderOverrides = {}, initialPieceId, includeHubAsPiece = false } = Astro.props;
+const { entryId, folder, initialPieceId, includeHubAsPiece = false } = Astro.props;
 
 const PLACEHOLDER_GALLERY: HubGalleryItem[] = [{ kind: 'image', src: '/images/placeholder.svg', w: 1200, h: 1500 }];
 
@@ -79,8 +81,7 @@ async function buildPiece(entry: (typeof sourceEntries)[number], relDir: string)
 const subPieces = await Promise.all(
   sourceEntries.map((entry) => {
     const defaultSlug = entry.id.slice(`${entryId}-`.length).replace(/-/g, '_');
-    const slug = folderOverrides[entry.id] ?? defaultSlug;
-    const relDir = isRealHub ? `${folder}/${slug}` : folder;
+    const relDir = isRealHub ? (entry.data.folder ?? `${folder}/${defaultSlug}`) : folder;
     return buildPiece(entry, relDir);
   })
 );

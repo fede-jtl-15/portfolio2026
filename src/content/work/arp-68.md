@@ -1,4 +1,5 @@
 ---
+folder: sound/arp68
 title: "arp:68"
 section: sound
 order: 4

@@ -1,4 +1,5 @@
 ---
+folder: installation/vistas
 title: vistas
 section: interactive
 order: 3

@@ -1,4 +1,5 @@
 ---
+folder: installation/frente_a_un_espejo_roto
 title: frente a un espejo roto
 section: interactive
 order: 4

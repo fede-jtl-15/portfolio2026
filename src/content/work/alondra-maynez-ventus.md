@@ -1,5 +1,7 @@
 ---
+folder: audiovisual/ventus
 title: "alondra máynez: ventus"
+label: alondra máynez
 section: av
 order: 6
 format: video

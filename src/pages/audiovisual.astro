@@ -1,18 +1,18 @@
 ---
+import { getCollection } from 'astro:content';
 import CategoryIndex, { type CategoryEntry } from '../components/CategoryIndex.astro';
 import { getStripImages } from '../lib/strip-images';
 
-// Labels and order exactly as given in public/text/audiovisual_TEXT.txt.
-const projects = [
-  { label: 'co de sus', href: '/work/co-de-sus' },
-  { label: 'belmar', href: '/work/belmar' },
-  { label: 'tr33.exe', href: '/work/tr33' },
-  { label: 'dialogues', href: '/work/dialogues' },
-  { label: 'eliangel', href: '/work/eliangel' },
-  { label: 'alondra máynez', href: '/work/alondra-maynez-ventus' },
-  { label: 'techno para dos', href: '/work/techno-para-dos' },
-  { label: 'tres islas', href: '/work/tres-islas' },
-];
+// Auto-generated from the content collection — a hub's own root entry or a
+// standalone piece (never a sub-piece, which has `hub` set) whose `folder`
+// starts with "audiovisual/", ordered by `order`. Adding a new piece here
+// is just a matter of giving its content entry a folder under
+// audiovisual/ — see src/pages/work/[id].astro and content.config.ts.
+const work = await getCollection('work', ({ data }) => !data.draft);
+const projects = work
+  .filter((e) => !e.data.hub && e.data.folder?.startsWith('audiovisual/'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((e) => ({ label: e.data.label ?? e.data.title, href: `/work/${e.id}` }));
 
 // getStripImages() matches each source file to a work entry by filename
 // (see findWorkMatch in src/lib/strip-images.ts). That works for belmar,

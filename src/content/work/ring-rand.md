@@ -1,4 +1,5 @@
 ---
+folder: installation/ring_rand
 title: ring / rand
 section: interactive
 order: 1

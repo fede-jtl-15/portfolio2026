@@ -1,0 +1,41 @@
+---
+import { getCollection } from 'astro:content';
+import Hub from '../../components/Hub.astro';
+
+// One route for every /work/<id> — a hub's own root entry, one of its
+// sub-pieces (entry.data.hub set), or a standalone piece with no hub at
+// all. Adding a new piece is then just: drop its folder + text file under
+// assets/, add one src/content/work/<id>.md with a `folder` (see
+// content.config.ts) — no route file, no category-listing edit. The
+// category pages (src/pages/{live,sound,audiovisual,interactive}.astro)
+// pick it up the same way, filtering this same collection by the first
+// path segment of `folder`.
+export async function getStaticPaths() {
+  const work = await getCollection('work', ({ data }) => !data.draft);
+  const byId = new Map(work.map((e) => [e.id, e]));
+
+  return work.map((entry) => {
+    const isSubPiece = !!entry.data.hub;
+    const hubEntry = isSubPiece ? byId.get(entry.data.hub!) : entry;
+    if (!hubEntry) {
+      throw new Error(`${entry.id}: hub "${entry.data.hub}" not found in src/content/work`);
+    }
+    if (!hubEntry.data.folder) {
+      throw new Error(`${hubEntry.id}: missing required "folder" in frontmatter (src/content.config.ts)`);
+    }
+    return {
+      params: { id: entry.id },
+      props: {
+        entryId: hubEntry.id,
+        folder: hubEntry.data.folder,
+        initialPieceId: isSubPiece ? entry.id : undefined,
+        includeHubAsPiece: hubEntry.data.includeHubAsPiece,
+      },
+    };
+  });
+}
+
+const { entryId, folder, initialPieceId, includeHubAsPiece } = Astro.props;
+---
+
+<Hub entryId={entryId} folder={folder} initialPieceId={initialPieceId} includeHubAsPiece={includeHubAsPiece} />

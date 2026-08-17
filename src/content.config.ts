@@ -25,7 +25,10 @@ const work = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/work' }),
   schema: z.object({
     title: z.string(),
-    section: z.enum(['performance', 'sound', 'interactive', 'av']),
+    // Legacy — unused since the old per-section template was replaced by
+    // Hub.astro/src/pages/work/[id].astro, kept optional rather than
+    // removed so it isn't a required field new entries have to bother with.
+    section: z.enum(['performance', 'sound', 'interactive', 'av']).optional(),
     // Shown in the index. Leave out and nothing renders.
     year: z.string().optional(),
     // Short noun phrase: "live set", "radio", "installation", "music video"
@@ -42,13 +45,29 @@ const work = defineCollection({
     draft: z.boolean().default(false),
     media: z.array(media).default([]),
     // Set on a piece to make it one of a hub's sub-projects — the value is
-    // the hub's own entry id (e.g. "co-de-sus"). The hub page (a bespoke
-    // page, not this generic template — see src/pages/work/co-de-sus.astro)
-    // gathers every entry sharing its id here into its submenu, ordered by
-    // `order`. Assets (background + gallery) come from
-    // public/images/proyectos/<category>/<hub>/<this piece's id minus the
-    // "<hub>-" prefix>/ by convention — see src/lib/hub-assets.ts.
+    // the hub's own entry id (e.g. "co-de-sus"). src/pages/work/[id].astro
+    // gathers every entry sharing its id here into the hub's submenu,
+    // ordered by `order`. A hub's own folder/includeHubAsPiece (below) are
+    // read from the HUB entry, not from its sub-pieces.
     hub: z.string().optional(),
+    // Path under assets/ (not public/) to this entry's images/videos — see
+    // the long note at the top of src/lib/hub-assets.ts for why sources
+    // live outside public/. Required on a standalone piece or a hub's own
+    // root entry. On a sub-piece (one with `hub` set above), only needed
+    // when its real folder name doesn't match the default convention (its
+    // id with the "<hub>-" prefix stripped and dashes turned to
+    // underscores) — e.g. a folder with a literal space or a name that
+    // otherwise doesn't line up with the id.
+    folder: z.string().optional(),
+    // Hub-root-only: also show the hub's own folder (not a sub-piece's) as
+    // an extra "home" entry in its piece list, with the kicker itself
+    // clickable to reach it — see includeHubAsPiece in src/components/Hub.astro.
+    includeHubAsPiece: z.boolean().default(false),
+    // Short override for how this entry's name appears in its category
+    // listing, when that should differ from the full `title` shown on the
+    // piece's own page (e.g. title "alondra máynez: ventus" but listed as
+    // just "alondra máynez"). Falls back to `title` when unset.
+    label: z.string().optional(),
     // Short labelled tag groups shown under the body copy, e.g.
     // { label: "sound", items: ["granular synthesis", "field recordings"] }.
     techniques: z.array(z.object({ label: z.string(), items: z.array(z.string()) })).default([]),

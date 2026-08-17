@@ -1,15 +1,18 @@
 ---
+import { getCollection } from 'astro:content';
 import CategoryIndex, { type CategoryEntry } from '../components/CategoryIndex.astro';
 import { getStripImages } from '../lib/strip-images';
 
-// Labels and order exactly as given in public/text/sound_TEXT.txt.
-const projects = [
-  { label: 'baladí', href: '/work/baladi' },
-  { label: '... el cielo es azul ...', href: '/work/el-cielo-es-azul' },
-  { label: "gracias a la vida 98'", href: '/work/gracias-a-la-vida' },
-  { label: 'arp:68', href: '/work/arp-68' },
-  { label: 'noise poems', href: '/work/noise-poems' },
-];
+// Auto-generated from the content collection — a hub's own root entry or a
+// standalone piece (never a sub-piece, which has `hub` set) whose `folder`
+// starts with "sound/", ordered by `order`. Adding a new piece here is just
+// a matter of giving its content entry a folder under sound/ — see
+// src/pages/work/[id].astro and content.config.ts.
+const work = await getCollection('work', ({ data }) => !data.draft);
+const projects = work
+  .filter((e) => !e.data.hub && e.data.folder?.startsWith('sound/'))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((e) => ({ label: e.data.label ?? e.data.title, href: `/work/${e.id}` }));
 
 const allStrip = await getStripImages();
 const soundImages = allStrip.filter((img) => img.src.includes('/cache/sound-'));
