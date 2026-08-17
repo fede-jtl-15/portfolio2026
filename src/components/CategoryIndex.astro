@@ -1,0 +1,418 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../lib/site';
+
+/**
+ * Shared layout for the four bespoke category pages (/live, /sound,
+ * /interactive, /audiovisual) — a clean page with a project list on the
+ * left, each entry revealing its photo full-bleed at the bottom-right on
+ * hover. First built for /live, then pulled out here once the same design
+ * was needed three more times, so a tweak only has to happen in one place.
+ */
+
+export interface CategoryEntry {
+  label: string;
+  href: string;
+  image?: { src: string; w: number; h: number };
+}
+
+interface Props {
+  title: string;
+  kicker: string;
+  currentHref: string;
+  entries: CategoryEntry[];
+}
+
+const { title, kicker, currentHref, entries } = Astro.props;
+
+const nav = [
+  { href: '/live', label: 'live visuals' },
+  { href: '/sound', label: 'sound' },
+  { href: '/interactive', label: 'installation' },
+  { href: '/audiovisual', label: 'audiovisual' },
+  { href: '/about', label: 'about' },
+];
+---
+
+<Base bare title={title}>
+  <main class="catpage">
+    <div class="catpage__topbar">
+      <div class="catpage__brand">
+        <h1 class="catpage__name"><a href="/"><span>{SITE.name}</span></a></h1>
+        <p class="catpage__kicker"><span>{kicker}</span></p>
+      </div>
+      <nav class="catpage__nav" aria-label="sections">
+        {
+          nav.map((n) => (
+            <a href={n.href} aria-current={n.href === currentHref ? 'page' : undefined}>
+              <span>{n.label}</span>
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+
+    <nav class="catpage__list" aria-label={`${kicker} projects`}>
+      {
+        entries.map((p) => (
+          <a class="catpage__item" href={p.href}>
+            <span class="catpage__item-label">{p.label}</span>
+            {p.image && (
+              <span class="catpage__preview" aria-hidden="true">
+                <img src={p.image.src} width={p.image.w} height={p.image.h} alt="" loading="lazy" decoding="async" />
+              </span>
+            )}
+          </a>
+        ))
+      }
+    </nav>
+
+    <p class="catpage__ticker" aria-label={SITE.description}>
+      <span class="catpage__ticker-track" aria-hidden="true">
+        {
+          [0, 1].map(() => (
+            <>
+              <span class="catpage__ticker-item">{SITE.description}</span>
+              <span class="catpage__ticker-sep">*</span>
+            </>
+          ))
+        }
+      </span>
+    </p>
+  </main>
+</Base>
+
+<script>
+  const MOBILE_BREAKPOINT = 768; // matches the 48rem breakpoint below
+  function isMobileLayout(): boolean {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+  }
+
+  // Same "cover past a threshold" idea as the hub pages' gallery column: a
+  // preview image already close to full viewport height (more than 80% of
+  // it at this fixed 50vw width) scales up the rest of the way to cover it
+  // exactly — growing past 50vw and getting cropped symmetrically by
+  // .catpage__preview's own overflow:hidden + align-items:center — instead
+  // of leaving a thin sliver of --gallery-bg above it. Mobile skips this
+  // entirely, since .catpage__preview is display:none there anyway. Width
+  // and height attributes are already known from the server (see
+  // CategoryEntry.image), so this doesn't need to wait for the lazy-loaded
+  // image to actually finish loading.
+  function sizePreviewImages() {
+    if (isMobileLayout()) return;
+    const containerWidthPx = window.innerWidth * 0.5;
+    const containerHeightPx = window.innerHeight;
+
+    document.querySelectorAll<HTMLImageElement>('.catpage__preview img').forEach((img) => {
+      const w = Number(img.getAttribute('width'));
+      const h = Number(img.getAttribute('height'));
+      if (!w || !h) return;
+      const ratio = w / h;
+      const heightAtContainerWidth = containerWidthPx / ratio;
+
+      let widthPx = containerWidthPx;
+      let heightPx = heightAtContainerWidth;
+      if (heightAtContainerWidth > containerHeightPx * 0.8 && heightAtContainerWidth < containerHeightPx) {
+        heightPx = containerHeightPx;
+        widthPx = containerHeightPx * ratio;
+      }
+
+      // global.css's plain `img { max-width: 100% }` reset isn't scoped —
+      // it still reaches this img and silently clamps a width grown past
+      // .catpage__preview's own 50vw back down to fit it (confirmed: a
+      // square photo asked to grow to 720px rendered at 640px instead).
+      // Overriding it inline is what makes the explicit width actually
+      // stick, same fix as the hub pages' gallery tiles needed.
+      img.style.maxWidth = 'none';
+      img.style.width = `${widthPx}px`;
+      img.style.height = `${heightPx}px`;
+    });
+  }
+
+  window.addEventListener('resize', sizePreviewImages);
+  sizePreviewImages();
+</script>
+
+<style>
+  .catpage {
+    --bg: #f1f0eb;
+    --gallery-bg: #f9f8f4;
+    --ink: #17181a;
+    --rule: rgba(23, 24, 26, 0.14);
+
+    position: relative;
+    min-height: 100svh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+  }
+
+  /* ================================ topbar ================================ */
+
+  /* z-index:5, clearly above .catpage__list's own 3 — .catpage__preview
+     (nested inside .catpage__list, not beside it) now reaches top:0 to
+     match the hub pages' full-height gallery column, which puts it
+     directly behind .catpage__nav's own screen position. Without this gap,
+     .catpage__list's whole subtree — including that now full-height
+     preview image — would win the tie against .catpage__topbar's equal
+     z-index:3 by simply coming later in the DOM, covering the nav links
+     whenever a preview is showing (confirmed via screenshot: it did). Same
+     hierarchy the hub pages use (.hub__topbar at 5 over .hub__gallery at
+     4) — chrome always stays above content, not the other way around. */
+  .catpage__topbar {
+    position: fixed;
+    z-index: 5;
+    inset: 0 0 auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem 2rem;
+    padding: 0;
+  }
+
+  .catpage__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .catpage__name {
+    margin: 0;
+    font-family: 'Bitcount Prop Single', var(--mono);
+    font-style: normal;
+    font-weight: 500;
+    font-size: clamp(1rem, 0.8rem + 0.8vw, 1.375rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .catpage__name a {
+    color: var(--ink);
+  }
+
+  .catpage__kicker {
+    margin: 0;
+    font-style: italic;
+    line-height: 1;
+    font-size: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+  }
+
+  /* Spans the right half of the viewport (not the whole width, not just
+     hugging the right edge) — items space-between across that half, so the
+     first one starts at the horizontal middle of the page and the last one
+     lands flush with the right edge. */
+  .catpage__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 50%;
+    margin-left: auto;
+    gap: 0.75rem 1.75rem;
+    font-style: italic;
+    font-size: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+  }
+
+  .catpage__nav a {
+    color: var(--ink);
+    transition: opacity 0.3s ease;
+  }
+
+  .catpage__nav a[aria-current='page'] {
+    opacity: 0.5;
+  }
+
+  .catpage__nav a:hover,
+  .catpage__nav a:focus-visible {
+    opacity: 0.6;
+  }
+
+  /* ================================= list ================================= */
+
+  /* True vertical centering via auto margins between top:0/bottom:0, not a
+     fixed top offset or a translateY — the list's height varies per page
+     (three short entries here, seven longer/wrapping ones there), so a
+     fixed top would center one page's list and misplace another's. A
+     transform would do this too, but a `transform` on an ancestor gives
+     every `position: fixed` descendant a new containing block — including
+     .catpage__preview below, which needs to stay fixed to the actual
+     viewport, not to this list. */
+  .catpage__list {
+    position: fixed;
+    z-index: 3;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    margin-top: auto;
+    margin-bottom: auto;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4em;
+    width: min(30vw, 20rem);
+    font-style: italic;
+    line-height: 1.35;
+    font-size: clamp(0.9375rem, 0.8rem + 0.4vw, 1.0625rem);
+  }
+
+  .catpage__item {
+    position: relative;
+    color: var(--ink);
+    transition: opacity 0.3s ease;
+  }
+
+  /* .catpage__preview (below) lives inside .catpage__item, not beside it —
+     so .catpage__list's own z-index:3 doesn't settle paint order between
+     them; that only governs the list as a whole against its own siblings
+     like .catpage__ticker. Within .catpage__item's own stacking context,
+     the preview's position:fixed + z-index:1 would otherwise let it paint
+     over this plain text (confirmed via elementFromPoint at a forced
+     overlap). Giving the label its own higher position+z-index is what
+     actually keeps the menu text in front, however wide a scaled-up
+     preview image grows. */
+  .catpage__item-label {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Dim the rest of the list while one entry is hovered/focused, so the
+     active one reads clearly — same spotlight idea as the still-image hover
+     on the / homepage. */
+  .catpage__list:has(.catpage__item:hover) .catpage__item:not(:hover),
+  .catpage__list:has(.catpage__item:focus-visible) .catpage__item:not(:focus-visible) {
+    opacity: 0.45;
+  }
+
+  /* ================================ preview ================================ */
+
+  /* Same treatment as the hub pages' image column (.hub__gallery-stack): a
+     fixed 50vw-wide strip flush to the right edge, full viewport height,
+     hidden until the matching .catpage__item is hovered/focused. The image
+     itself is flush to the bottom (column-reverse packs its single child at
+     the bottom when reversed); --gallery-bg, a touch lighter than the
+     page's own --bg, fills whatever's left above it, and overflow:hidden
+     clips a photo tall enough to run past the top instead of growing the
+     box. */
+  .catpage__preview {
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 50vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    background: var(--gallery-bg);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.45s ease;
+  }
+
+  .catpage__item:hover .catpage__preview,
+  .catpage__item:focus-visible .catpage__preview {
+    opacity: 1;
+  }
+
+  .catpage__preview img {
+    display: block;
+    width: 50vw;
+    height: auto;
+  }
+
+  /* ================================ ticker ================================ */
+
+  /* z-index:5 to match .catpage__topbar — it already happened to win
+     against .catpage__preview by coming later in the DOM, but pinning it
+     explicitly (rather than relying on source order) keeps it correct even
+     if that ordering ever changes. */
+  .catpage__ticker {
+    position: fixed;
+    z-index: 5;
+    inset: auto 0 0 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-style: italic;
+    font-size: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .catpage__ticker-track {
+    display: inline-flex;
+    width: max-content;
+    animation: catpage-ticker-scroll 12s linear infinite;
+  }
+
+  .catpage__ticker-item {
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+  }
+
+  .catpage__ticker-sep {
+    opacity: 0.5;
+  }
+
+  @keyframes catpage-ticker-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (max-width: 48rem) {
+    /* Static, not absolute — the topbar's nav can wrap to two lines on
+       narrow screens, and only normal flow reliably pushes the list down
+       below however tall that ends up being. Hover has no real equivalent
+       on touch, so the preview panel is dropped rather than faked. */
+    .catpage__topbar {
+      position: static;
+    }
+
+    .catpage__nav {
+      width: auto;
+      margin-left: 0;
+    }
+
+    .catpage__list {
+      position: relative;
+      left: auto;
+      top: auto;
+      bottom: auto;
+      margin: 0;
+      height: auto;
+      width: auto;
+      padding: 1.5rem 0 6rem;
+    }
+
+    .catpage__preview {
+      display: none;
+    }
+
+    .catpage__ticker {
+      position: relative;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .catpage__nav a,
+    .catpage__item,
+    .catpage__preview {
+      transition: none;
+    }
+    .catpage__ticker-track {
+      display: inline;
+      animation: none;
+    }
+    .catpage__ticker-track > :nth-child(n + 3) {
+      display: none;
+    }
+    .catpage__ticker {
+      text-overflow: ellipsis;
+    }
+  }
+</style>

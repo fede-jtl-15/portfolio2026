@@ -1,15 +1,18 @@
 export const SITE = {
   name: 'federico torres',
   role: 'sound, performance, audiovisual',
-  description: 'live sets, radio, installations and audiovisual work.',
-  email: 'hello@example.com',
+  description:
+    'time-based media to explore abstraction focusing on the ephemeral and ever-changing nature of time and memory.',
+  email: 'fede.jtl.torres.3@gmail.com',
 };
 
 export const SOCIALS = [
-  { label: 'instagram', href: 'https://instagram.com/' },
-  { label: 'soundcloud', href: 'https://soundcloud.com/' },
-  { label: 'bandcamp', href: 'https://bandcamp.com/' },
-  { label: 'vimeo', href: 'https://vimeo.com/' },
+  { label: 'soundcloud', href: 'https://soundcloud.com/co_de_sus' },
+  { label: 'youtube', href: 'https://www.youtube.com/watch?v=bj_bUWxEYCw' },
+  { label: 'vimeo', href: 'https://vimeo.com/user127961587' },
+  { label: 'instagram', href: 'https://www.instagram.com/elfedete/' },
+  { label: 'mixcloud', href: 'https://www.mixcloud.com/elfedete/' },
+  { label: 'bandcamp', href: 'https://codesus.bandcamp.com/music' },
 ];
 
 export type SectionId = 'performance' | 'sound' | 'interactive' | 'av';

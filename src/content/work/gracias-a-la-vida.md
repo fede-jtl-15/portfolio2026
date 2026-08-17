@@ -1,14 +1,17 @@
 ---
-title: Gracias a la vida
+title: gracias a la vida 98'
 section: sound
-order: 4
-# year: "2024"
+order: 3
 format: recording
+links:
+  - label: soundcloud
+    href: https://soundcloud.com/co_de_sus/gracias-a-la-vida-99-v2
 media: []
-# media:
-#   - kind: vimeo        # vimeo | youtube | soundcloud | bandcamp | audio | image
-#     src: "123456789"   # see _embeds.md for the exact format of each kind
-#     title: Full set
+textFile: sound/graciasalavida_TEXT.txt
 ---
 
-Write a short paragraph here — what it is, where it happened, who it was with. Two or three sentences is usually enough.
+'galv' 99 is a reference to the humanitarian anthem 'Gracias a la vida' composed by Chilean singer Violeta Parra. The project revolves around a photograph taken by my parents in Chile in 1998, a year after I was born. The photo is a "near-memory" that has accompanied me throughout my life. I don't believe I remember the moment the photo was taken, but after seeing it so many times, I've come to imagine a memory that is entirely my own.
+
+The project consists of recreating a soundscape of that imagined memory. Through the sound piece, I aim to explore the dynamic between real sound and imagined sound. The track is composed of two pieces: the "soundscape" and the "dreamscape." Through a slow transition between the two, it highlights the fine line between what is real and imagined, between altered memories and objective events.
+
+The "dreamscape" uses Violeta Parra's composition as a base, acting as a mantra to appreciate the act of remembrance. As in Gracias a la Vida, the piece emphasises gratitude for experiences and memories, whether real or imagined, reflecting the complex ways we construct our personal realities. By layering abstract textures, the dreamscape blurs the boundaries between what was actually experienced and the emotional or imaginative distortions of the past.

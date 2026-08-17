@@ -41,6 +41,30 @@ const work = defineCollection({
     // Hides the entry entirely from the built site.
     draft: z.boolean().default(false),
     media: z.array(media).default([]),
+    // Set on a piece to make it one of a hub's sub-projects — the value is
+    // the hub's own entry id (e.g. "co-de-sus"). The hub page (a bespoke
+    // page, not this generic template — see src/pages/work/co-de-sus.astro)
+    // gathers every entry sharing its id here into its submenu, ordered by
+    // `order`. Assets (background + gallery) come from
+    // public/images/proyectos/<category>/<hub>/<this piece's id minus the
+    // "<hub>-" prefix>/ by convention — see src/lib/hub-assets.ts.
+    hub: z.string().optional(),
+    // Short labelled tag groups shown under the body copy, e.g.
+    // { label: "sound", items: ["granular synthesis", "field recordings"] }.
+    techniques: z.array(z.object({ label: z.string(), items: z.array(z.string()) })).default([]),
+    // Plain outbound links — full URLs, not embed IDs (see `media` above for
+    // that) — rendered on the .hub__social-nav row, each opening in a new
+    // tab. `label` should be copied verbatim from public/text/_links/LINKS.txt
+    // (e.g. "youtube", "soundcloud", "48nk", "research"), not invented —
+    // whatever's written there is what's shown, no fixed set of platforms.
+    links: z.array(z.object({ label: z.string(), href: z.string() })).default([]),
+    // Path under public/text/ to this piece's plain-text source (see
+    // src/lib/piece-text.ts) — when set, the page's body copy (and link
+    // labels, once a piece has a *LINKS* section) come live from that file
+    // instead of this entry's own markdown body below, which then only
+    // matters as a fallback for pieces that don't have a real source file
+    // yet.
+    textFile: z.string().optional(),
   }),
 });
 

@@ -5,9 +5,11 @@ import { SITE, SECTIONS } from '../lib/site';
 interface Props {
   title?: string;
   description?: string;
+  /** Skip the masthead/footer chrome and render only the slot content. */
+  bare?: boolean;
 }
 
-const { title, description = SITE.description } = Astro.props;
+const { title, description = SITE.description, bare = false } = Astro.props;
 const pageTitle = title ? `${title} / ${SITE.name}` : `${SITE.name} / ${SITE.role}`;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const current = (href: string) =>
@@ -26,7 +28,8 @@ const links = [...SECTIONS.map((s) => ({ href: `/${s.id}`, label: s.label })), {
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -34,36 +37,56 @@ const links = [...SECTIONS.map((s) => ({ href: `/${s.id}`, label: s.label })), {
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300;1,400;1,500&display=swap"
     />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Single:wght@100..900&display=swap"
+    />
+    {
+      bare && (
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..600&display=swap"
+        />
+      )
+    }
   </head>
 
   <body>
-    <a class="skip" href="#main">skip to content</a>
-
-    <div class="shell">
-      <header class="masthead">
-        <a class="masthead__name" href="/">{SITE.name}</a>
-        <nav aria-label="sections">
-          {
-            links.map((l, i) => (
-              <>
-                {i > 0 && <span aria-hidden="true">/</span>}
-                <a href={l.href} aria-current={current(l.href)}>
-                  {l.label}
-                </a>
-              </>
-            ))
-          }
-        </nav>
-      </header>
-
-      <main id="main">
+    {
+      bare ? (
         <slot />
-      </main>
+      ) : (
+        <>
+          <a class="skip" href="#main">skip to content</a>
 
-      <footer class="colophon">
-        <span>{SITE.name} <span class="aside">(all rights reserved)</span></span>
-        <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-      </footer>
-    </div>
+          <div class="shell">
+            <header class="masthead">
+              <a class="masthead__name" href="/">{SITE.name}</a>
+              <nav aria-label="sections">
+                {
+                  links.map((l, i) => (
+                    <>
+                      {i > 0 && <span aria-hidden="true">/</span>}
+                      <a href={l.href} aria-current={current(l.href)}>
+                        {l.label}
+                      </a>
+                    </>
+                  ))
+                }
+              </nav>
+            </header>
+
+            <main id="main">
+              <slot />
+            </main>
+
+            <footer class="colophon">
+              <span>{SITE.name} <span class="aside">(all rights reserved)</span></span>
+              <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+            </footer>
+          </div>
+        </>
+      )
+    }
   </body>
 </html>

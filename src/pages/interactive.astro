@@ -1,0 +1,24 @@
+---
+import CategoryIndex, { type CategoryEntry } from '../components/CategoryIndex.astro';
+import { getStripImages } from '../lib/strip-images';
+
+// Labels and order exactly as given in public/text/installation_TEXT.txt.
+const projects = [
+  { label: 'ring / rand', href: '/work/ring-rand' },
+  { label: 'incidental', href: '/work/incidental' },
+  { label: 'vistas', href: '/work/vistas' },
+  { label: 'frente a un espejo roto', href: '/work/frente-a-un-espejo-roto' },
+  { label: 'bow.distort.warp', href: '/work/bend-distort-warp' },
+];
+
+const allStrip = await getStripImages();
+const installationImages = allStrip.filter((img) => img.src.includes('/strip/installation-'));
+const imageByHref = new Map<string, (typeof installationImages)[number]>();
+for (const img of installationImages) {
+  if (!imageByHref.has(img.href)) imageByHref.set(img.href, img);
+}
+
+const entries: CategoryEntry[] = projects.map((p) => ({ ...p, image: imageByHref.get(p.href) }));
+---
+
+<CategoryIndex title="interactive" kicker="interactive / instalación" currentHref="/interactive" entries={entries} />

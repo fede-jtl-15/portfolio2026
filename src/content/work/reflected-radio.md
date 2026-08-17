@@ -1,17 +1,36 @@
 ---
-title: Reflected Radio
+title: reflected radio
 section: performance
-order: 1
-# year: "2024"
+order: 3
 format: radio series
 blurb: A six-part radio series.
-media: []
-# media:
-#   - kind: vimeo        # vimeo | youtube | soundcloud | bandcamp | audio | image
-#     src: "123456789"   # see _embeds.md for the exact format of each kind
-#     title: Full set
+credits:
+  - markus l
+  - butz
+  - audoathlet
+  - soulcontrol
+  - daniel s
+  - tasha safari
+media:
+  - kind: youtube
+    src: "0hCqjal6Ywo"
+    title: markus l
+  - kind: youtube
+    src: "pAKHGrX6pg0"
+    title: butz
+  - kind: youtube
+    src: "QK5o4H3MLu8"
+    title: audoathlet
+  - kind: youtube
+    src: "XRvqSN35MK0"
+    title: soulcontrol
+  - kind: youtube
+    src: "2PndbWKLtak"
+    title: daniel s
+  - kind: youtube
+    src: "rLmXOzXxtsk"
+    title: tasha safari
+textFile: live/reflectedradio_TEXT.txt
 ---
 
-Six episodes. Say what the series is, how it was broadcast, and what holds the six together.
-
-Add each episode as its own item under `media:` with a title, so the page reads as a run of six players.
+Text for this piece hasn't been written yet.

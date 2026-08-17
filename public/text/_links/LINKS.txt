@@ -1,0 +1,158 @@
+_ audiovisual:
+	* co de sus:
+		+ cuadros:
+		bandcamp: https://codesus.bandcamp.com/album/cuadros
+		soundcloud: https://on.soundcloud.com/IQa13e1z79L2dbEFgV
+		spotify: https://open.spotify.com/artist/1v830WmXPBjRcQLudfXOy1?si=HsPeHwUhSumn4M9M73ocFw
+		youtube:
+			- alla afuerá: https://youtu.be/5KKBzjkIU8w
+			- estructura: https://youtu.be/iPNzeW7Qhv0?si=Q83ywXNjscAEwZt8
+			- movida: https://youtu.be/YAQluSxZkOA?si=kb-fIiBQI7S9k1XX
+			- pasaje: https://youtu.be/ScOY4YSGXFc?si=OrrHjlb3ejBMR-AQ
+		+ fluye
+		bandcamp: https://codesus.bandcamp.com/album/fluye
+		soundcloud: https://on.soundcloud.com/o7M8uko23ozDgEpdLn
+		spotify: https://open.spotify.com/artist/1v830WmXPBjRcQLudfXOy1?si=HsPeHwUhSumn4M9M73ocFw
+			youtube:
+			- promesa: https://www.youtube.com/watch?v=Yw34IoywpB0&ab_channel=codesus
+			- estela: https://www.youtube.com/watch?v=hTXN-6QcdqQ&ab_channel=codesus
+			- emana: https://www.youtube.com/watch?v=bj_bUWxEYCw&ab_channel=codesus
+			- salida: https://www.youtube.com/watch?v=aQ-4P7Bl-j8&t=180s&ab_channel=codesus
+		+estancias:
+		bandcamp: https://codesus.bandcamp.com/album/estancias
+		soundcloud: https://on.soundcloud.com/NnlO5ytTuEwKJFI94F
+		spotify: https://open.spotify.com/artist/1v830WmXPBjRcQLudfXOy1?si=HsPeHwUhSumn4M9M73ocFw
+
+	* belmar:
+		+ nights without coffee:
+		spotify: https://open.spotify.com/album/5rpBV5f5r2CDeMz0juxDVF?si=2z001YoNRJKt164lkrmePA
+		youtube: https://www.youtube.com/watch?v=oPr5xuiuHgg&ab_channel=BelmarBelmar
+		+ seasons:
+		spotify: https://open.spotify.com/album/7xwoSR5beP1KCfhuVBxIyy?si=4c9smrFbTSKffhlXl17LDw
+		youtube:
+			- only: https://www.youtube.com/watch?v=oEoaJjrbfd0&ab_channel=BelmarBelmar
+			- aching: https://www.youtube.com/watch?v=XX2ASswp7Jg&ab_channel=BelmarBelmar
+		+ luz de neon:
+		spotify: https://open.spotify.com/album/0IhEX3eUApOihmOhQ53dCt?si=hhTcpKzYSaqYmUUnZ4P1xQ
+		youtube:
+			- solamente: https://www.youtube.com/watch?v=siNU6xsNb18&ab_channel=BelmarBelmar
+			- frappe: https://www.youtube.com/watch?v=v8x0_lCsdZo&ab_channel=BelmarBelmar
+			- bonito: https://www.youtube.com/watch?v=v31m7Tg99YE&ab_channel=BelmarBelmar
+			- suerte: https://www.youtube.com/watch?v=uCiHfR0TI2k&ab_channel=BelmarBelmar
+		+ tomasss:
+		spotify: 
+			- cerca mia: https://open.spotify.com/album/26oIaQygyv2wH5qMwx2IH0?si=j2Htbej7Soq4NjgVZ0783Q
+			- bien suave: https://open.spotify.com/album/3OPXLck0enG1bmVnmk3fhJ?si=2t13fd1NQy-TVEJzZC8-wg
+			- cuando se va el sol: https://open.spotify.com/album/0aet0TGNffcKydDRbgghpX?si=9463Y9XLSiW9WbOBGE--qg
+			- duermes: https://open.spotify.com/album/5ypgEzTnVSDaenAswD7x9q?si=Sab2Gfq0QVy7WYX1HkN2qA
+			- el gato: https://open.spotify.com/album/4rnUU3m0MZoqdFZXRiqbcj?si=kKlDC_dNSpaFGY4ur_PY4w
+	* tr33:
+	video: https://drive.google.com/file/d/1uoThrzPTVRr5wWnuaJduSFDBPuvQaPQn/view?usp=sharing
+
+	* dialogues:
+	video: https://youtu.be/KhZHycq5dXo
+
+	* eliangel:
+		+ tomenta espacios:
+		spotify: https://open.spotify.com/album/3kNsNjR3hryVi4Djoknr3w?si=-qP300ExRkiQyzcOIl9r8Q
+		youtube:
+			- tormenta: https://www.youtube.com/watch?v=PIJMqKflG-g&ab_channel=ELIANGEL
+			- espacios: https://www.youtube.com/watch?v=b70gRci2bPs&ab_channel=ELIANGEL
+		+ mi vibe: 
+		spotify: https://www.youtube.com/watch?v=6geMzF3FKa0&ab_channel=ELIANGEL
+		youtube: https://www.youtube.com/watch?v=6geMzF3FKa0&ab_channel=ELIANGEL
+
+	*techno para dos:
+		+ hardrama:
+		spotify: https://www.youtube.com/watch?v=6ADjAU_0ZRg&ab_channel=KrisBerle
+		youtube: https://www.youtube.com/watch?v=6ADjAU_0ZRg&ab_channel=KrisBerle
+		+ drama and bass:
+		spotify: https://www.youtube.com/watch?v=ogYQFjk4F18&ab_channel=TechnoParaDos
+		youtube: https://www.youtube.com/watch?v=ogYQFjk4F18&ab_channel=TechnoParaDos
+		+ sin futuro:
+		spotify: https://www.youtube.com/watch?v=ogYQFjk4F18&ab_channel=TechnoParaDos
+		video: https://drive.google.com/file/d/17zy2LHr2gib5IDyb8fSHj_guoxqjwV5t/view?usp=sharing
+
+	* alondra maynez - ventus:
+		spotify: https://www.youtube.com/watch?v=DX05hwYih1o&ab_channel=AlondraM%C3%A1ynez
+		youtube: https://www.youtube.com/watch?v=DX05hwYih1o&ab_channel=AlondraM%C3%A1ynez
+
+	* tres islas:
+		spotify: https://open.spotify.com/artist/7CRBLbMHIR0QIrBGhj4mc8?si=MNofiC08RHK8oPJkjGCiVA
+		youtube: https://www.youtube.com/@tresislas5878/playlists
+
+_ live:
+	* transit cadence:
+		soundcloud: https://on.soundcloud.com/alGZXRR8tKosypMfI7
+		video: https://drive.google.com/drive/folders/15Dkv_LcqdV-EFkDockQgBL5AQkSB4_2o?usp=sharing
+
+	* scenes from a memory:
+		video: https://drive.google.com/file/d/1aGs9Ko8CYEp1STfX8pOhg2x0p3waK6WY/view?usp=drive_link
+		info: https://docs.google.com/presentation/d/1nouWgSGxVlVK04R2RxCQlg-rLPkoLIgWOW0AfQhu8bY/edit?usp=sharing
+
+	* refelcted radio:
+		markus l: https://www.youtube.com/watch?v=0hCqjal6Ywo&t=1466s
+		butz: https://www.youtube.com/watch?v=pAKHGrX6pg0&t=1082s
+		audoathlet: https://www.youtube.com/watch?v=QK5o4H3MLu8&t=1973s
+		soulcontrol: https://www.youtube.com/watch?v=XRvqSN35MK0&t=14s
+		daniel s: https://www.youtube.com/watch?v=2PndbWKLtak&t=643s
+		tasha safari: https://www.youtube.com/watch?v=rLmXOzXxtsk&t=44s
+
+	* warp:
+		youtube: https://www.facebook.com/WARPmagazine/videos/305717283903971/
+		live: https://www.facebook.com/WARPmagazine/videos/305717283903971/
+
+	* hologramas:
+		youtube: https://www.youtube.com/watch?v=sikEAVELIPE&t=1666s&ab_channel=Hologramas
+
+	* aire libre:
+		youtube: https://www.youtube.com/watch?v=2JRLLarpEkA&t=3s&ab_channel=AireLibre3.0
+
+	*mutek:
+		lineup: https://mutek.org/jp/news/final-lineup-for-the-first-hybrid-edition-of-mutek-mx-jp
+
+	* vj* 
+		+ seventhfield:
+		+ softblech: https://www.instagram.com/reel/Dbn46KQsldq/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==
+		+ md2: https://www.instagram.com/p/DVtj-adEfI2/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==
+		+ md1: https://www.instagram.com/reel/DQJlC7GiIsJ/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==
+		+ vj open lab: https://youtu.be/cffN_qBG6Y0?si=6p0I2NwzWqhje2bU
+
+_ sound:
+	* gracias a la vida:
+		soundcloud: https://soundcloud.com/co_de_sus/gracias-a-la-vida-99-v2
+
+	*arp:68:
+		soundcloud: 
+
+	* el cielo es azul:
+		soundcloud: https://soundcloud.com/basan-basan-basan/el-cielo-es-azul
+
+	* baladí
+		mixcloud: https://www.mixcloud.com/baladi_radio/reposts/
+		soundcloud: https://soundcloud.com/baladi-radio
+		instagram: https://www.instagram.com/baladi_radio
+		telegram: https://t.me/baladi_radio
+
+	* noise poems:
+
+_installation:
+	* frente a un espejo roto:
+		soundcloud: https://on.soundcloud.com/IJWWluYUVAdqhCf7He
+		twitter: https://twitter.com/therewhereimnot
+		video: https://vimeo.com/manage/805955152/general
+
+	* vistas:
+		research: https://drive.google.com/file/d/1aEcvOpyVpa5e6ms408RTq7jSk4YztuTf/view?usp=sharing
+
+	* incidental
+		video 1: https://youtube.com/shorts/3C494YIlycw?feature=share
+		video 2: https://youtube.com/shorts/S4f9SJVHbrs?feature=share
+
+	* ring / rand
+		video 1: https://youtu.be/Ik-KBSKWMk4
+		video 2: https://youtu.be/ZYloA6ZLtB4
+		48nk: https://luma.com/sde422ok
+
+	* bow.distort.warp:
+		video: https://drive.google.com/file/d/1hsrvfq5ED7pWQUiRfdXIJ6fAuSwgpjdD/view?usp=sharing

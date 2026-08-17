@@ -1,0 +1,15 @@
+---
+import Hub from '../../components/Hub.astro';
+
+// Real source folder has a stray space + a leftover typo ("withouth") from
+// the original upload — public/images/proyectos/audiovisual/belmar/nights
+// withouth_coffee — so the id-derived slug (nights_without_coffee) doesn't
+// match and needs an explicit override.
+---
+
+<Hub
+  entryId="belmar"
+  folder="audiovisual/belmar"
+  initialPieceId="belmar-nights-without-coffee"
+  folderOverrides={{ 'belmar-nights-without-coffee': 'nights withouth_coffee' }}
+/>

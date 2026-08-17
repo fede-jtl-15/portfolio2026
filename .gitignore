@@ -5,3 +5,37 @@ dist/
 *.log
 .env
 .env.production
+r2-credentials.txt
+.r2-staging/
+
+# Generated on every build from public/images/** — regenerated fresh by the
+# Cloudflare Pages build itself, not needed in git. Currently several GB;
+# committing it would bloat every future clone for no benefit. Catches every
+# "strip" cache dir (proyectos/strip, proyectos/<category>/strip,
+# home/strip, ...), not just the ones that exist today.
+public/images/**/strip/
+
+# Unused scratch folder of candidate landing-page images (226MB, not read by
+# any current page/component — grepped for references, found none). Kept on
+# disk, just not worth committing; ask before deleting it outright.
+public/images/proyectos/_landing_2/
+
+# Leftover from the deleted /idea-2 draft homepage (idea_landing_2.mp4) and
+# an old unused tr33 reference clip (tr33.mp4) — neither is referenced by
+# any current page/component. Kept on disk, not worth committing.
+public/videos/
+
+# Videos are hosted on Cloudflare R2 instead of git — GitHub hard-blocks any
+# single file over 100MB, and this project's source footage regularly runs
+# past that (several 200MB+ reels). See src/lib/r2-media.ts and
+# scripts/migrate-videos-to-r2.mjs — run that script after adding a new
+# video so it gets uploaded and added to src/data/r2-media.json.
+public/images/proyectos/**/*.mp4
+public/images/proyectos/**/*.mov
+public/images/proyectos/**/*.m4v
+public/images/proyectos/**/*.webm
+public/images/proyectos/audiovisual/tres_islas/Caricias_Video_IG_V2.gif
+public/images/home/*.mp4
+public/images/home/*.mov
+public/images/home/*.m4v
+public/images/home/*.webm

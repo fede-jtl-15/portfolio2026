@@ -1,14 +1,13 @@
 ---
-title: Transit Cadence
+title: transit cadence
 section: performance
-order: 6
-# year: "2024"
+order: 2
 format: live set
+links:
+  - label: soundcloud
+    href: https://on.soundcloud.com/alGZXRR8tKosypMfI7
 media: []
-# media:
-#   - kind: vimeo        # vimeo | youtube | soundcloud | bandcamp | audio | image
-#     src: "123456789"   # see _embeds.md for the exact format of each kind
-#     title: Full set
+textFile: live/transitcadence_TEXT.txt
 ---
 
-Write a short paragraph here — what it is, where it happened, who it was with. Two or three sentences is usually enough.
+Text for this piece hasn't been written yet.

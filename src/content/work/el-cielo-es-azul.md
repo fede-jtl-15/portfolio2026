@@ -1,14 +1,23 @@
 ---
-title: El cielo es azul
+title: "... el cielo es azul ..."
 section: sound
-order: 3
-# year: "2024"
+order: 2
 format: recording
+credits:
+  - alp seyrekbasan
+links:
+  - label: soundcloud
+    href: https://soundcloud.com/basan-basan-basan/el-cielo-es-azul
 media: []
-# media:
-#   - kind: vimeo        # vimeo | youtube | soundcloud | bandcamp | audio | image
-#     src: "123456789"   # see _embeds.md for the exact format of each kind
-#     title: Full set
+textFile: sound/elcieloesazul_TEXT.txt
 ---
 
-Write a short paragraph here — what it is, where it happened, who it was with. Two or three sentences is usually enough.
+Together with turkish sound artist, Alp Seyrekbasan, we developed the transmedia piece: '…el cielo es azul…'; the title refers to a phrase coined by Mexican poet Amado Nervo: 'el cielo es azul, el mar es salado y la vida es incierta'. The phrase translates to: 'the sky is blue, the sea is salty and life is uncertain.'
+
+The work commissioned by Moabit's PAS is an exploration of the mundane. It is a moment forever in transit, never arriving. The project explores the rhythmic nature of 'Strassenleben' day in, day out; the repetitive qualities of sporadic moments in time, bound to be repeated throughout infinity, but never quite revealing the pattern underneath.
+
+Moabit's Zentrum für Kunst und Urbanistik served as the context for this project, both sonically and visually. The recordings of the wind, the birds, people, cars and trains shape the soundscape, while the movement of the sun and the sky above serve as the visual reference for the piece.
+
+The 'ZKU' is a place of community, a place to gather, to relax, to play, to enjoy. It's located near Moabit's northern border. To the South, people that have migrated to the city, building communities, establishing bonds, growing together. To the North, the Behala Westhafen Port, an industrial complex, business and machines. Train tracks divide these two opposites, presenting a transitional space. The trains show the constant movement of the city, people come and people go. The station is as much a place for goodbyes as a haven for people to come and build a life.
+
+The space offers an opportunity to take a break from the mundane, to stop and contemplate, to be in peace, breathe in, and continue. The mix of natural sounds, humans and machinery sync up to create a soundscape where everything seems to fall into space, until it tears itself apart, forming in a mesmerising and perfectly balanced cacophony.

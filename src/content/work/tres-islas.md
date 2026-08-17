@@ -1,14 +1,21 @@
 ---
-title: Tres islas
+title: tres islas
 section: av
-order: 6
-# year: "2024"
+order: 8
 format: video
+credits:
+  - juan leonardo torres lópez
+links:
+  - label: spotify
+    href: https://open.spotify.com/artist/7CRBLbMHIR0QIrBGhj4mc8?si=MNofiC08RHK8oPJkjGCiVA
 media: []
-# media:
-#   - kind: vimeo        # vimeo | youtube | soundcloud | bandcamp | audio | image
-#     src: "123456789"   # see _embeds.md for the exact format of each kind
-#     title: Full set
+textFile: audiovisual/tres_islas/tresislas_TEXT.txt
 ---
 
-Write a short paragraph here — what it is, where it happened, who it was with. Two or three sentences is usually enough.
+Tres Islas is a project developed by brothers Juan Leonardo Torres López (producer) and Federico de Jesús Torres López (visual artist). The project revolves around nostalgia and simplicity. It is a study on the lo-fi genre, music made at home, without major pretensions, connecting both artists with the contexts in which they grew up and the communal memory of these spaces.
+
+The productions have generative aspects, seeking to explore in 7-track packages the feeling of belonging, always attached to different aspects of the life the artists have shared growing up together in Mexico.
+
+The aesthetics, both visual and sonic, change after each 7-track block. For each block a generative system is created so that through a series of rules and instructions a semiotic context (both musically and visually) arises. These scenarios allow the 7-track to unfold each in a unique context. For each release the artists enter a dialogue of their past trying to grasp at vague memories and feelings that shaped them.
+
+The project is deeply personal, and tries to materialise abstract notions of growing up, belonging, nostalgia, love and the passing of time. All of the tracks try to relate to the artist's upbringing, while maintaining an abstract and distant aura.

@@ -1,0 +1,45 @@
+---
+import CategoryIndex, { type CategoryEntry } from '../components/CategoryIndex.astro';
+import { getStripImages } from '../lib/strip-images';
+
+// Labels and order exactly as given in public/text/live_TEXT.txt.
+const projects = [
+  { label: 'scenes from a memory', href: '/work/scenes-from-a-memory' },
+  { label: 'transit cadence', href: '/work/transit-cadence' },
+  { label: 'reflected radio', href: '/work/reflected-radio' },
+  { label: 'hologramas', href: '/work/hologramas' },
+  { label: 'late night ambient', href: '/work/late-night-ambient' },
+  { label: 'PULSE: warp x common sense', href: '/work/techno-para-dos-warp' },
+  { label: 'mutek', href: '/work/mutek' },
+  { label: 'visual jockey', href: '/work/visual-jockey' },
+];
+
+// getStripImages() matches each source file to a work entry by filename
+// (see findWorkMatch in src/lib/strip-images.ts), which fails for a couple
+// of these — the source photo is named after the old id or the blurb, not
+// the current one. Mapped by hand instead of trusting that match, so they
+// aren't silently dropped. visual_jockey has no photo uploaded yet, so it
+// renders without a hover preview.
+const LIVE_FILE_HREF: Record<string, string> = {
+  hologramas: '/work/hologramas',
+  late_night_ambient: '/work/late-night-ambient',
+  techno_para_dos_warp: '/work/techno-para-dos-warp',
+  scenes_from_a_memory: '/work/scenes-from-a-memory',
+  transit_cadence: '/work/transit-cadence',
+  mutek: '/work/mutek',
+};
+
+const allStrip = await getStripImages();
+const liveImages = allStrip.filter((img) => img.src.includes('/strip/live-'));
+const imageByHref = new Map<string, (typeof liveImages)[number]>();
+for (const img of liveImages) {
+  const base = img.src.match(/\/strip\/live-(.+)\.jpg$/)?.[1] ?? '';
+  const href = base.startsWith('reflected_radio') ? '/work/reflected-radio' : LIVE_FILE_HREF[base];
+  if (!href || imageByHref.has(href)) continue; // one representative image per project is enough here
+  imageByHref.set(href, img);
+}
+
+const entries: CategoryEntry[] = projects.map((p) => ({ ...p, image: imageByHref.get(p.href) }));
+---
+
+<CategoryIndex title="live" kicker="live visuals" currentHref="/live" entries={entries} />

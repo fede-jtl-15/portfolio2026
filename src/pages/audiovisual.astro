@@ -1,0 +1,53 @@
+---
+import CategoryIndex, { type CategoryEntry } from '../components/CategoryIndex.astro';
+import { getStripImages } from '../lib/strip-images';
+
+// Labels and order exactly as given in public/text/audiovisual_TEXT.txt.
+const projects = [
+  { label: 'co de sus', href: '/work/co-de-sus' },
+  { label: 'belmar', href: '/work/belmar' },
+  { label: 'tr33.exe', href: '/work/tr33' },
+  { label: 'dialogues', href: '/work/dialogues' },
+  { label: 'eliangel', href: '/work/eliangel' },
+  { label: 'alondra máynez', href: '/work/alondra-maynez-ventus' },
+  { label: 'techno para dos', href: '/work/techno-para-dos' },
+  { label: 'tres islas', href: '/work/tres-islas' },
+];
+
+// getStripImages() matches each source file to a work entry by filename
+// (see findWorkMatch in src/lib/strip-images.ts). That works for belmar,
+// co_de_sus and tres_islas, but not for the photos named after a piece
+// within a hub rather than the hub itself (hard_drama/drama_and_bass belong
+// to the "techno para dos" piece list, mi_vibe to eliangel's), or ventus,
+// whose file is just "ventus" while the work id is "alondra-maynez-ventus".
+// Mapped by hand instead of trusting that match, so they aren't silently
+// dropped.
+const AV_FILE_HREF: Record<string, string> = {
+  belmar: '/work/belmar',
+  co_de_sus: '/work/co-de-sus',
+  dialogue_full: '/work/dialogues',
+  dialogue_full_v2: '/work/dialogues',
+  dialogue_full_v3: '/work/dialogues',
+  drama_and_bass: '/work/techno-para-dos',
+  hard_drama: '/work/techno-para-dos',
+  mi_vibe: '/work/eliangel',
+  sin_futuro: '/work/techno-para-dos',
+  tr33exe: '/work/tr33',
+  tres_islas: '/work/tres-islas',
+  ventus: '/work/alondra-maynez-ventus',
+};
+
+const allStrip = await getStripImages();
+const avImages = allStrip.filter((img) => img.src.includes('/strip/audiovisual-'));
+const imageByHref = new Map<string, (typeof avImages)[number]>();
+for (const img of avImages) {
+  const base = img.src.match(/\/strip\/audiovisual-(.+)\.jpg$/)?.[1] ?? '';
+  const href = AV_FILE_HREF[base];
+  if (!href || imageByHref.has(href)) continue;
+  imageByHref.set(href, img);
+}
+
+const entries: CategoryEntry[] = projects.map((p) => ({ ...p, image: imageByHref.get(p.href) }));
+---
+
+<CategoryIndex title="audiovisual" kicker="audiovisual" currentHref="/audiovisual" entries={entries} />

@@ -1,24 +1,15 @@
 ---
-title: Techno para dos
+title: techno para dos
 section: av
-order: 3
-# year: "2024"
+order: 7
 format: video
 credits:
-  - Techno para dos
+  - techno para dos
 media: []
-# Each piece below gets its own embed. Fill in src and delete the #:
-#   - kind: vimeo
-#     src: "PASTE_VIMEO_ID"
-#     title: Hardrama
-#   - kind: vimeo
-#     src: "PASTE_VIMEO_ID"
-#     title: Drum n Bass
-#   - kind: vimeo
-#     src: "PASTE_VIMEO_ID"
-#     title: Sin tiempo
 ---
 
-Write a short paragraph here — what it is, where it happened, who it was with. Two or three sentences is usually enough.
-
-Pieces: Hardrama, Drum n Bass, Sin tiempo.
+Umbrella entry for the techno para dos hub — see techno-para-dos-hard-drama.md,
+techno-para-dos-drama-and-bass.md and techno-para-dos-sin-futuro.md for the
+real pieces and their text. This entry's own body/media are never rendered
+(src/components/Hub.astro only shows the sub-pieces), it just anchors the
+hub's title, section and order.

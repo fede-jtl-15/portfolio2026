@@ -1,14 +1,16 @@
 ---
-title: Incidental
+title: incidental
 section: interactive
-order: 1
-# year: "2024"
+order: 2
 format: installation
-media: []
-# media:
-#   - kind: vimeo        # vimeo | youtube | soundcloud | bandcamp | audio | image
-#     src: "123456789"   # see _embeds.md for the exact format of each kind
-#     title: Full set
+media:
+  - kind: youtube
+    src: "3C494YIlycw"
+    title: video 1
+  - kind: youtube
+    src: "S4f9SJVHbrs"
+    title: video 2
+textFile: installation/incidental_TEXT.txt
 ---
 
-Write a short paragraph here — what it is, where it happened, who it was with. Two or three sentences is usually enough.
+Text for this piece hasn't been written yet.

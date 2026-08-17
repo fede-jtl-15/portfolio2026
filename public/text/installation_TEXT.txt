@@ -1,0 +1,5 @@
+ring / rand
+incidental
+vistas
+frente a un espejo roto
+bow.distort.warp

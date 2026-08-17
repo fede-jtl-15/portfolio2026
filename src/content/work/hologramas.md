@@ -1,17 +1,19 @@
 ---
-title: Hologramas
+title: hologramas
 section: performance
-order: 3
-# year: "2024"
+order: 5
 format: live set
 credits:
   - dj hiccup
   - co de sus
-media: []
-# media:
-#   - kind: vimeo        # vimeo | youtube | soundcloud | bandcamp | audio | image
-#     src: "123456789"   # see _embeds.md for the exact format of each kind
-#     title: Full set
+  - esteban bruera
+media:
+  - kind: youtube
+    src: "sikEAVELIPE"
+    title: youtube
+textFile: live/hologramas_TEXT.txt
 ---
 
-Write a short paragraph here — what it is, where it happened, who it was with. Two or three sentences is usually enough.
+Experienced dj and promoter of the Mexico City scene, Esteban Bruera, collaborates with emerging creative technologist Federico Torres in this piece of digital modular synthesis, who also visualises the piece with his distinctive generative art, debuting his projects as Dj Hiccup and co_de_sus.
+
+For 30 minutes the duo explore ideas of modular synthesis in an auditive and also visual way. The project was developed during the COVID-19 pandemic, inviting us to collaborate while being distant, having to create a back and forth communication that enriched and shaped the final piece. The work is a representation of coming together and being apart at the same time, collision and distance. While working on this piece the artists were forced to reconsider their creative process, engaging in topics of co-creation, and how to be together while being distant. The project was a means of exploring new ways of collaboration and for communication and community building.

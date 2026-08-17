@@ -1,47 +1,476 @@
 ---
 import Base from '../layouts/Base.astro';
 import { SITE, SOCIALS } from '../lib/site';
+
+// Bespoke bio page — same topbar/ticker chrome as the four category pages
+// (see src/components/CategoryIndex.astro) and the co-de-sus hub
+// (src/components/CoDeSusHub.astro): a fixed 50vw image column on the
+// right (.about__portrait, same sizing technique as .hub__gallery-stack /
+// .catpage__preview) and everything else confined to the left half.
+const nav = [
+  { href: '/live', label: 'live visuals' },
+  { href: '/sound', label: 'sound' },
+  { href: '/interactive', label: 'installation' },
+  { href: '/audiovisual', label: 'audiovisual' },
+  { href: '/about', label: 'about' },
+];
+
+const bio = [
+  `New Media Artist working in the fields of Sound, Interactive Installations & Performance, Audiovisual & Experimental Film, and Art Direction. His work focuses on the exploration and exploitation of the relationship between humans and computers. Through it he strives to work with themes of identity, the self in the digital age and extended humanism.`,
+  `Federico started working as a Creative Director, developing concepts, images and videos for different artists. Applying both artistic and technical expertise, he switched his focus to real-time Audiovisual & Experimental development as well as the creation of Interactive Installations. Through his work he has collaborated with various artists like Isaac Soto (mx), Techno Para Dos (mx), Eliangel (ve), Alp Seyrekbasan (tr), Belmar (mx) and Alondra Maynez (mx) and the Korrupt Sound Roster (de).`,
+  `In the last years Federico's work has been shifting to a more performative aspect, by emphasising a layered and transmediatic work process he seeks to involve the audience more encouraging them to engage in a role as active performers.`,
+  `He studied Interactive Design in Mexico City and later focused his studies in New Media and Media Spaces in Berlin. His work has been featured in various festivals, events and venues such as Mutek MX+JP 2020, Manifest:IO 2023, ADAF Greece 2024, Casa Patricio (mx), EDC Mexico (2022), Symbiotism 2023, Catalyst, amongst others.`,
+];
+
+const DOCS = [
+  { label: 'cv', href: 'https://docs.google.com/document/d/1VrEcLonTbrt4eBoOjz4zqPYqKn6PNDWb8ltnTAK-cRY/edit?usp=sharing' },
+  {
+    label: 'portfolio',
+    href: 'https://docs.google.com/presentation/d/1glUwIOJsTja4AzUmz4EmlaDIqY9Sxl3CTx3a7xl8Wio/edit?usp=sharing',
+  },
+];
 ---
 
-<Base title="about">
-  <div class="about">
-    <div class="about__bio">
-      <h1>{SITE.name} <span class="aside">(bio)</span></h1>
-
-      <p>
-        write the short version first: where you're based, what you make, and
-        the through-line between the radio, the installations and the video
-        work.
-      </p>
-      <p>
-        then the longer version: how you got here, who you work with regularly,
-        and what you're doing at the moment. keep it to something a promoter
-        could paste into a listing without editing it.
-      </p>
-    </div>
-
-    <aside>
-      <section class="card">
-        <p>(contact)</p>
-        <ul>
-          <li><a href={`mailto:${SITE.email}`}>{SITE.email}</a></li>
-        </ul>
-      </section>
-
-      <section class="card">
-        <p>(elsewhere)</p>
-        <ul>
+<Base bare title="about">
+  <main class="about">
+    <div class="about__topbar">
+      <div class="about__row">
+        <div class="about__brand">
+          <h1 class="about__name"><a href="/"><span>{SITE.name}</span></a></h1>
+          <p class="about__kicker"><span>about</span></p>
+        </div>
+        <nav class="about__nav" aria-label="sections">
           {
-            SOCIALS.map((s) => (
-              <li>
-                <a href={s.href} rel="me noopener" target="_blank">
-                  {s.label}
-                </a>
-              </li>
+            nav.map((n) => (
+              <a href={n.href} aria-current={n.href === '/about' ? 'page' : undefined}>
+                <span>{n.label}</span>
+              </a>
             ))
           }
-        </ul>
-      </section>
-    </aside>
-  </div>
+        </nav>
+      </div>
+
+      <div class="about__left">
+        <nav class="about__socials" aria-label="elsewhere">
+          {
+            SOCIALS.map((s) => (
+              <a href={s.href} rel="me noopener" target="_blank">
+                {s.label}
+              </a>
+            ))
+          }
+        </nav>
+        <nav class="about__docs" aria-label="documents">
+          {
+            DOCS.map((d) => (
+              <a href={d.href} target="_blank" rel="noopener">
+                {d.label}
+              </a>
+            ))
+          }
+        </nav>
+        <p class="about__contact">
+          bookings / collaborations / communications: <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="about__bio" id="about-bio">
+      {bio.map((p) => <p>{p}</p>)}
+    </div>
+
+    <div class="about__portrait">
+      <img id="about-portrait-img" src="/images/bio/bio_header_5.gif" width="745" height="745" alt={SITE.name} />
+    </div>
+
+    <p class="about__ticker" aria-label={SITE.description}>
+      <span class="about__ticker-track" aria-hidden="true">
+        {
+          [0, 1].map(() => (
+            <>
+              <span class="about__ticker-item">{SITE.description}</span>
+              <span class="about__ticker-sep">*</span>
+            </>
+          ))
+        }
+      </span>
+    </p>
+  </main>
 </Base>
+
+<script>
+  const MOBILE_BREAKPOINT = 768; // matches the 48rem breakpoint below
+
+  function isMobileLayout(): boolean {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+  }
+
+  // Same "cover past a threshold" technique as the hub pages' gallery column
+  // (see sizeForRatio in CoDeSusHub.astro) — the portrait fills this fixed
+  // 50vw-wide column at its natural ratio; past 85% of the viewport height
+  // it scales up the rest of the way to cover it exactly, growing past 50vw
+  // and getting cropped symmetrically by .about__portrait's own
+  // overflow:hidden + align-items:center. Width/height are already known
+  // from the img's own attributes, so this doesn't need to wait for the
+  // (large, local) gif to actually finish loading.
+  function sizePortrait() {
+    const img = document.getElementById('about-portrait-img') as HTMLImageElement | null;
+    if (!img) return;
+
+    if (isMobileLayout()) {
+      // Mobile hands sizing back to the plain CSS rule (width:100%) — clear
+      // any desktop-computed inline size left over from before a resize
+      // crossed the breakpoint, since an inline style would otherwise keep
+      // outranking it.
+      img.style.width = '';
+      img.style.height = '';
+      img.style.maxWidth = '';
+      return;
+    }
+
+    const w = Number(img.getAttribute('width'));
+    const h = Number(img.getAttribute('height'));
+    if (!w || !h) return;
+    const ratio = w / h;
+
+    const containerWidthPx = window.innerWidth * 0.5;
+    const containerHeightPx = window.innerHeight;
+    const heightAtContainerWidth = containerWidthPx / ratio;
+
+    let widthPx = containerWidthPx;
+    let heightPx = heightAtContainerWidth;
+    if (heightAtContainerWidth > containerHeightPx * 0.85 && heightAtContainerWidth < containerHeightPx) {
+      heightPx = containerHeightPx;
+      widthPx = containerHeightPx * ratio;
+    }
+
+    // global.css's plain `img { max-width: 100% }` reset isn't scoped — it
+    // would otherwise clamp a width grown past the 50vw column back down,
+    // same fix the hub and category pages both needed for their own
+    // scaled-up images.
+    img.style.maxWidth = 'none';
+    img.style.width = `${widthPx}px`;
+    img.style.height = `${heightPx}px`;
+  }
+
+  window.addEventListener('resize', sizePortrait);
+  sizePortrait();
+</script>
+
+<style>
+  .about {
+    --bg: #f1f0eb;
+    --gallery-bg: #f9f8f4;
+    --ink: #17181a;
+    --rule: rgba(23, 24, 26, 0.14);
+    /* The ticker's own rendered height (line-height:1, no padding, so this
+       equals its font-size exactly) — shared with .about__portrait and
+       .about__bio below so both sit flush against it with zero gap and
+       without extending underneath its opaque background. */
+    --ticker-h: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+
+    position: relative;
+    min-height: 100svh;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+  }
+
+  /* ================================ topbar ================================ */
+
+  /* z-index:5, above .about__portrait's own 4 — same chrome-always-on-top
+     convention as the hub/category pages (.hub__topbar:5 > .hub__gallery:4,
+     .catpage__topbar:5 > .catpage__list:3). Two stacked rows, same as
+     .hub__topbar: name+nav, then the socials/docs/contact block confined to
+     the left half — that block used to sit pinned above the ticker instead;
+     moving it up here is what makes this page "resemble the project
+     pages". */
+  .about__topbar {
+    position: fixed;
+    z-index: 5;
+    inset: 0 0 auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    padding: 0;
+  }
+
+  .about__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem 2rem;
+  }
+
+  .about__brand {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .about__name {
+    margin: 0;
+    font-family: 'Bitcount Prop Single', var(--mono);
+    font-style: normal;
+    font-weight: 500;
+    font-size: clamp(1rem, 0.8rem + 0.8vw, 1.375rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .about__name a {
+    color: var(--ink);
+  }
+
+  .about__kicker {
+    margin: 0;
+    font-style: italic;
+    line-height: 1;
+    font-size: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+  }
+
+  /* Spans the right half of the viewport — items space-between across that
+     half, so the first lands at the horizontal middle of the page and the
+     last is flush with the right edge (same as every other page's nav). */
+  .about__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 50%;
+    margin-left: auto;
+    gap: 0.75rem 1.75rem;
+    font-style: italic;
+    font-size: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+  }
+
+  .about__nav a {
+    color: var(--ink);
+    transition: opacity 0.3s ease;
+  }
+
+  .about__nav a[aria-current='page'] {
+    opacity: 0.5;
+  }
+
+  .about__nav a:hover,
+  .about__nav a:focus-visible {
+    opacity: 0.6;
+  }
+
+  /* ================================= left ================================== */
+
+  /* Confined to the left half, same as .hub__left — keeps this block clear
+     of .about__portrait's 50vw column on the right. Socials, documents and
+     contact are three distinct rows, each its own block. */
+  .about__left {
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    font-style: italic;
+    /* Otherwise inherits the global body line-height (1.95) — with three
+       stacked rows and gap:0, that leading is what was still reading as
+       visible space between levels even with no margin/gap of their own. */
+    line-height: 1.15;
+    font-size: clamp(0.9375rem, 0.8rem + 0.3vw, 1.0625rem);
+  }
+
+  .about__left nav,
+  .about__left p {
+    margin: 0;
+  }
+
+  /* Socials and docs each spread their links across the full column width
+     (edge to edge) instead of clustering at the left with the rest of the
+     line empty — same distribution idea as the topbar's category nav. */
+  .about__socials,
+  .about__docs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .about__socials a,
+  .about__docs a,
+  .about__contact a {
+    color: var(--ink);
+    transition: opacity 0.3s ease;
+  }
+
+  .about__socials a:hover,
+  .about__socials a:focus-visible,
+  .about__docs a:hover,
+  .about__docs a:focus-visible,
+  .about__contact a:hover,
+  .about__contact a:focus-visible {
+    opacity: 0.6;
+  }
+
+  .about__contact {
+    font-size: clamp(0.875rem, 0.8rem + 0.2vw, 0.9375rem);
+  }
+
+  .about__contact a {
+    margin-left: 0.35em;
+  }
+
+  /* ================================== bio ================================= */
+
+  /* Confined to the left half (right:50%, matching .about__portrait's own
+     50vw column) and starting 40% down the page — same measure and same
+     start line as .hub__panels on the project pages. Runs down to the
+     ticker now that the links block above no longer needs room reserved
+     beneath the bio for it. Scrolls internally if the copy ever runs long
+     enough not to fit; the surrounding chrome stays put. */
+  .about__bio {
+    position: fixed;
+    z-index: 3;
+    left: 0;
+    right: 50%;
+    top: 40%;
+    bottom: var(--ticker-h);
+    overflow-y: auto;
+    padding-right: clamp(1rem, 3vw, 2rem);
+    font-style: italic;
+    line-height: 1.5;
+    font-size: clamp(0.9375rem, 0.8rem + 0.3vw, 1.0625rem);
+  }
+
+  .about__bio p {
+    margin: 0 0 1.1em;
+  }
+
+  /* ================================ portrait =============================== */
+
+  /* Same treatment as the hub pages' image column (.hub__gallery-stack) and
+     the category pages' preview (.catpage__preview): a fixed 50vw-wide strip
+     flush to the right edge, full viewport height. The image sits flush to
+     the bottom (column-reverse packs its single child at the bottom when
+     reversed) and --gallery-bg — a touch lighter than the page's own --bg —
+     fills whatever's left above it; overflow:hidden clips a portrait sized
+     (by the script above) taller than the column. */
+  .about__portrait {
+    position: fixed;
+    z-index: 4;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 50vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    background: var(--gallery-bg);
+  }
+
+  .about__portrait img {
+    display: block;
+    width: 50vw;
+    height: auto;
+  }
+
+  /* ================================ ticker ================================ */
+
+  .about__ticker {
+    position: fixed;
+    z-index: 5;
+    inset: auto 0 0 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-style: italic;
+    font-size: var(--ticker-h);
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .about__ticker-track {
+    display: inline-flex;
+    width: max-content;
+    animation: about-ticker-scroll 12s linear infinite;
+  }
+
+  .about__ticker-item {
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+  }
+
+  .about__ticker-sep {
+    opacity: 0.5;
+  }
+
+  @keyframes about-ticker-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .about__topbar {
+      position: static;
+      padding: 0 clamp(1.25rem, 5vw, 2rem);
+    }
+
+    .about__nav {
+      width: auto;
+      margin-left: 0;
+    }
+
+    .about__left {
+      width: auto;
+      padding: 1rem 0;
+    }
+
+    .about__bio {
+      position: relative;
+      left: auto;
+      top: auto;
+      bottom: auto;
+      right: auto;
+      overflow-y: visible;
+      width: auto;
+      padding: 1.5rem clamp(1.25rem, 5vw, 2rem) 0;
+    }
+
+    .about__portrait {
+      position: relative;
+      right: auto;
+      bottom: auto;
+      width: auto;
+      padding: 0 clamp(1.25rem, 5vw, 2rem) 2rem;
+    }
+
+    .about__portrait img {
+      width: 100%;
+      max-width: none;
+    }
+
+    .about__ticker {
+      position: relative;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about__nav a,
+    .about__socials a,
+    .about__docs a,
+    .about__contact a {
+      transition: none;
+    }
+    .about__ticker-track {
+      display: inline;
+      animation: none;
+    }
+    .about__ticker-track > :nth-child(n + 3) {
+      display: none;
+    }
+    .about__ticker {
+      text-overflow: ellipsis;
+    }
+  }
+</style>

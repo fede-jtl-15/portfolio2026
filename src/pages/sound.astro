@@ -1,0 +1,24 @@
+---
+import CategoryIndex, { type CategoryEntry } from '../components/CategoryIndex.astro';
+import { getStripImages } from '../lib/strip-images';
+
+// Labels and order exactly as given in public/text/sound_TEXT.txt.
+const projects = [
+  { label: 'baladí', href: '/work/baladi' },
+  { label: '... el cielo es azul ...', href: '/work/el-cielo-es-azul' },
+  { label: "gracias a la vida 98'", href: '/work/gracias-a-la-vida' },
+  { label: 'arp:68', href: '/work/arp-68' },
+  { label: 'noise poems', href: '/work/noise-poems' },
+];
+
+const allStrip = await getStripImages();
+const soundImages = allStrip.filter((img) => img.src.includes('/strip/sound-'));
+const imageByHref = new Map<string, (typeof soundImages)[number]>();
+for (const img of soundImages) {
+  if (!imageByHref.has(img.href)) imageByHref.set(img.href, img);
+}
+
+const entries: CategoryEntry[] = projects.map((p) => ({ ...p, image: imageByHref.get(p.href) }));
+---
+
+<CategoryIndex title="sound" kicker="sound" currentHref="/sound" entries={entries} />

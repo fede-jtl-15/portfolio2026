@@ -1,14 +1,24 @@
 ---
-title: Baladí
+title: baladí
 section: sound
 order: 1
-# year: "2024"
 format: recording
+links:
+  - label: mixcloud
+    href: https://www.mixcloud.com/baladi_radio/reposts/
+  - label: soundcloud
+    href: https://soundcloud.com/baladi-radio
+  - label: instagram
+    href: https://www.instagram.com/baladi_radio
+  - label: telegram
+    href: https://t.me/baladi_radio
 media: []
-# media:
-#   - kind: vimeo        # vimeo | youtube | soundcloud | bandcamp | audio | image
-#     src: "123456789"   # see _embeds.md for the exact format of each kind
-#     title: Full set
+textFile: sound/baladi_TEXT.txt
 ---
 
-Write a short paragraph here — what it is, where it happened, who it was with. Two or three sentences is usually enough.
+Home entry for the baladí hub — see baladi-b001.md, baladi-b002.md and
+baladi-b003.md for the individual episodes. Unlike the other hubs, this
+entry IS rendered (see includeHubAsPiece on Hub.astro): it's the "home"
+piece the kicker links back to, with its own text (sound/baladi_TEXT.txt)
+and gallery (the flat images directly in public/images/proyectos/sound/baladi/,
+not the per-episode subfolders).

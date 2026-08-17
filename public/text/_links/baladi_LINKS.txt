@@ -1,0 +1,61 @@
+*b001:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-hosted-by-fede-amp-java/
+
+*b002:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-hosted-by-fede-amp-java-2/
+	- soundcloud: https://on.soundcloud.com/3Yg1Ho2P55SLdcKqwh
+
+*b003:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-hosted-by-fede-amp-java-3/
+	- soundcloud: https://on.soundcloud.com/mf5kUR8Wnodhbzl0J6
+
+*b004:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-hosted-by-fede-amp-java-4/
+
+*b005:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-hosted-by-fede-amp-java-5/
+
+*b006:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-hosted-by-fede-amp-java-6/
+
+*b007:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-007-bogot%C3%A1-hosted-by-fede-java/
+	- soundcloud: https://on.soundcloud.com/AfH6OyYQyuXEEadUSc
+
+*b008:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-008/
+	- soundcloud: https://on.soundcloud.com/ReAEnfBAJwZraFaG7W
+
+*b009:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-009-tokyo-hosted-by-fede-java/
+	- soundcloud: https://on.soundcloud.com/LqSzusXUayUlve5EZv
+
+*b010:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-010-occitaania-hosted-by-fede-java/
+	- soundcloud: https://on.soundcloud.com/JI19pcPxTfi4pcA22q
+
+*b011:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-011-santo-domingo-hosted-by-fede-java/
+	- soundcloud: https://on.soundcloud.com/AvDo70gAlzbhkHpjMc
+
+*b012:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-012-bay-area-hosted-by-fede-java/
+	- soundcloud: https://on.soundcloud.com/ExI2Ld9887xi0Kucfu
+
+*b013:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-013-distrito-federal-hosted-by-fede-java/
+	- soundcloud:
+
+*b014:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-014-ciudad-de-guatemala-hosted-by-fede-java/
+	- soundcloud: https://on.soundcloud.com/wL5uMbtTFGnlPy8g1N
+
+*b015:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-015-valencia-hosted-by-fede-java/
+	- soundcloud: https://on.soundcloud.com/hy48iPB2OglssY9lrN
+
+*b016:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-016-berlin-hosted-by-fede-java/
+
+*b017:
+	- mixcloud: https://www.mixcloud.com/90milradio/baladi-017-mumbai-hosted-by-fede-java/

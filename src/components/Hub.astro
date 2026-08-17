@@ -1,0 +1,1215 @@
+---
+import { getCollection, render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { SITE } from '../lib/site';
+import { getHubAssets, type HubGalleryItem } from '../lib/hub-assets';
+import { getPieceText } from '../lib/piece-text';
+
+// Splitscreen project page — used for every /work/* entry, whether it's a
+// project made of several sub-pieces (the `hub` field on the work schema
+// groups them, switched via the submenu below the header with no page
+// reload — co-de-sus, belmar, etc.) or a single standalone piece (no
+// submenu, just the one piece). One component covers both: pass the hub's
+// own entry id and it gathers whichever entries declare it as their `hub`
+// — when none do, the entry becomes its own sole piece. The kicker (the
+// project's own name, top-left) always shows either way — only the
+// submenu next to it is conditional, so every page states what project
+// it's on, hub or not.
+//
+// Assets come from public/images/proyectos/<folder>/<piece slug>/ for a
+// real multi-piece hub, or straight from public/images/proyectos/<folder>/
+// for a standalone piece (no extra nesting on disk). A piece's slug
+// defaults to its id with the "<entryId>-" prefix stripped and dashes
+// turned to underscores (matching the source folders' own naming) — pass
+// `folderOverrides` for the handful whose folder name doesn't follow that
+// convention (a stray space, a typo carried over from the original
+// upload). A piece with no real gallery yet (folder missing or empty)
+// falls back to a single placeholder image rather than an empty column.
+//
+// `includeHubAsPiece` (currently just baladí) makes the hub entry itself
+// browsable as an extra "home" piece — its own text/gallery come straight
+// from `folder` (no per-piece subfolder, no per-piece text file convention
+// to follow), and the kicker becomes a clickable button back to it,
+// alongside the real sub-pieces in the submenu.
+interface Props {
+  entryId: string;
+  folder: string;
+  folderOverrides?: Record<string, string>;
+  initialPieceId?: string;
+  includeHubAsPiece?: boolean;
+}
+
+const { entryId, folder, folderOverrides = {}, initialPieceId, includeHubAsPiece = false } = Astro.props;
+
+const PLACEHOLDER_GALLERY: HubGalleryItem[] = [{ kind: 'image', src: '/images/placeholder.svg', w: 1200, h: 1500 }];
+
+const nav = [
+  { href: '/live', label: 'live visuals' },
+  { href: '/sound', label: 'sound' },
+  { href: '/interactive', label: 'installation' },
+  { href: '/audiovisual', label: 'audiovisual' },
+  { href: '/about', label: 'about' },
+];
+
+const all = await getCollection('work', ({ data }) => !data.draft);
+const hubEntry = all.find((e) => e.id === entryId);
+if (!hubEntry) throw new Error(`Entry "${entryId}" not found in src/content/work`);
+
+const pieceEntries = all.filter((e) => e.data.hub === entryId).sort((a, b) => a.data.order - b.data.order);
+const isRealHub = pieceEntries.length > 0;
+const sourceEntries = isRealHub ? pieceEntries : [hubEntry];
+
+async function buildPiece(entry: (typeof sourceEntries)[number], relDir: string) {
+  const assets = await getHubAssets(relDir);
+  const { Content } = await render(entry);
+  const pieceText = entry.data.textFile ? getPieceText(entry.data.textFile) : null;
+  return {
+    id: entry.id,
+    title: entry.data.title,
+    techniques: entry.data.techniques,
+    media: entry.data.media,
+    links: entry.data.links,
+    Content,
+    pieceText,
+    gallery: assets.gallery.length > 0 ? assets.gallery : PLACEHOLDER_GALLERY,
+  };
+}
+
+const subPieces = await Promise.all(
+  sourceEntries.map((entry) => {
+    const defaultSlug = entry.id.slice(`${entryId}-`.length).replace(/-/g, '_');
+    const slug = folderOverrides[entry.id] ?? defaultSlug;
+    const relDir = isRealHub ? `${folder}/${slug}` : folder;
+    return buildPiece(entry, relDir);
+  })
+);
+
+const homePiece = includeHubAsPiece && isRealHub ? await buildPiece(hubEntry, folder) : null;
+const pieces = homePiece ? [homePiece, ...subPieces] : subPieces;
+
+// Falls back to the home piece (if this hub has one) or the first sub-piece
+// otherwise, when no prop is passed — the plain hub route, or any
+// standalone entry, which only ever has one piece regardless. The title
+// only follows a specific piece when one was actually requested by URL —
+// the plain hub route keeps the hub's own title rather than borrowing
+// whichever piece happens to be first.
+const initialId = initialPieceId ?? homePiece?.id ?? pieces[0]?.id;
+const requestedPiece = initialPieceId ? pieces.find((p) => p.id === initialPieceId) : undefined;
+const pageTitle = requestedPiece ? requestedPiece.title : hubEntry.data.title;
+---
+
+<Base bare title={pageTitle}>
+  <main class="hub">
+    <div class="hub__topbar">
+      <div class="hub__row">
+        <h1 class="hub__name"><a href="/"><span>{SITE.name}</span></a></h1>
+        <nav class="hub__nav" aria-label="sections">
+          {
+            nav.map((n) => (
+              <a href={n.href}>
+                <span>{n.label}</span>
+              </a>
+            ))
+          }
+        </nav>
+      </div>
+      <div class="hub__left">
+        <div class="hub__row">
+          <p class="hub__kicker">
+            {
+              homePiece ? (
+                <button type="button" class="hub__kicker-btn" data-piece={homePiece.id} data-piece-trigger aria-current={homePiece.id === initialId ? 'true' : 'false'}>
+                  <span>{hubEntry.data.title}</span>
+                </button>
+              ) : (
+                <span>{hubEntry.data.title}</span>
+              )
+            }
+          </p>
+          {
+            isRealHub && (
+              <nav
+                class="hub__submenu"
+                id="hub-submenu"
+                aria-label={`${hubEntry.data.title} pieces`}
+                style={`--submenu-cols:${Math.min(subPieces.length, 4)}`}
+              >
+                {subPieces.map((p) => (
+                  <button type="button" class="hub__submenu-item" data-piece={p.id} data-piece-trigger aria-current={p.id === initialId ? 'true' : 'false'}>
+                    {p.title}
+                  </button>
+                ))}
+              </nav>
+            )
+          }
+        </div>
+
+        <div class="hub__media-nav" id="hub-media-nav">
+          {
+            pieces.map((p) => {
+              const videos = p.media.filter((m) => m.kind === 'youtube' || m.kind === 'vimeo');
+              if (videos.length === 0) return null;
+              return (
+                <div class="hub__media-group" data-piece={p.id} style={p.id === initialId ? '' : 'display:none;'}>
+                  {videos.map((v) => (
+                    <button
+                      type="button"
+                      class="hub__media-item"
+                      data-kind={v.kind}
+                      data-video-id={v.src}
+                      aria-current="false"
+                    >
+                      {v.title ?? 'video'}
+                    </button>
+                  ))}
+                </div>
+              );
+            })
+          }
+        </div>
+
+        <div class="hub__social-nav" id="hub-social-nav">
+          {
+            pieces.map((p) => {
+              if (p.links.length === 0) return null;
+              return (
+                <nav class="hub__social-group" data-piece={p.id} style={p.id === initialId ? '' : 'display:none;'} aria-label="links">
+                  {p.links.map((l) => (
+                    <a href={l.href} target="_blank" rel="noopener noreferrer">
+                      {l.label}
+                    </a>
+                  ))}
+                </nav>
+              );
+            })
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="hub__panels" id="hub-panels">
+      {
+        pieces.map((p) => {
+          const { Content } = p;
+          return (
+            <div class="hub__panel" data-piece={p.id} style={p.id === initialId ? '' : 'display:none;'}>
+              {
+                p.pieceText
+                  ? p.pieceText.bodyParagraphs.map((para) => <p class={para.tight ? 'tight' : undefined} set:html={para.html} />)
+                  : <Content />
+              }
+              {p.techniques.length > 0 && (
+                <dl class="hub__techniques">
+                  {p.techniques.map((t) => (
+                    <div>
+                      <dt>{t.label}:</dt>
+                      <dd>{t.items.join(' / ')}</dd>
+                    </div>
+                  ))}
+                </dl>
+              )}
+            </div>
+          );
+        })
+      }
+    </div>
+
+    <div class="hub__gallery" id="hub-gallery">
+      <div class="hub__gallery-data" hidden aria-hidden="true">
+        {
+          pieces.map((p) => (
+            <div class="hub__gallery-grid" data-piece={p.id} style={p.id === initialId ? '' : 'display:none;'}>
+              {p.gallery.map((g, j) => (
+                <img
+                  class="hub__gallery-img"
+                  data-index={j}
+                  data-kind={g.kind}
+                  data-src={g.src}
+                  style={j === 0 ? '' : 'display:none;'}
+                  width={g.kind === 'image' ? g.w : undefined}
+                  height={g.kind === 'image' ? g.h : undefined}
+                  alt=""
+                  decoding="async"
+                />
+              ))}
+            </div>
+          ))
+        }
+      </div>
+      <div class="hub__gallery-stack" id="hub-gallery-stack" />
+      <button type="button" class="hub__gallery-zone hub__gallery-zone--prev" id="hub-gallery-prev" aria-label="previous photo" />
+      <button type="button" class="hub__gallery-zone hub__gallery-zone--next" id="hub-gallery-next" aria-label="next photo" />
+    </div>
+
+    <div class="hub__video-modal" id="hub-video-modal" hidden>
+      <div class="hub__video-modal-backdrop"></div>
+      <div class="hub__video-modal-frame">
+        <button type="button" class="hub__video-modal-close" id="hub-video-modal-close" aria-label="close video">×</button>
+        <div class="hub__video-modal-embed" id="hub-video-modal-embed" />
+      </div>
+    </div>
+
+    <p class="hub__ticker" aria-label={SITE.description}>
+      <span class="hub__ticker-track" aria-hidden="true">
+        {
+          [0, 1].map(() => (
+            <>
+              <span class="hub__ticker-item">{SITE.description}</span>
+              <span class="hub__ticker-sep">*</span>
+            </>
+          ))
+        }
+      </span>
+    </p>
+  </main>
+</Base>
+
+<script>
+  // Delegated on .hub__left (not just #hub-submenu) so the kicker button
+  // — the "back to home" trigger, currently only baladí has one — is
+  // caught by the same click handler as the submenu's own piece buttons.
+  const pieceNav = document.querySelector('.hub__left');
+  const panels = document.getElementById('hub-panels');
+  const mediaNav = document.getElementById('hub-media-nav');
+  const socialNav = document.getElementById('hub-social-nav');
+  const galleryWrap = document.getElementById('hub-gallery');
+  const galleryStack = document.getElementById('hub-gallery-stack');
+  const galleryPrev = document.getElementById('hub-gallery-prev');
+  const galleryNext = document.getElementById('hub-gallery-next');
+  const videoModal = document.getElementById('hub-video-modal');
+  const videoModalEmbed = document.getElementById('hub-video-modal-embed');
+  const videoModalClose = document.getElementById('hub-video-modal-close');
+
+  // The video-title links no longer swap out what .hub__gallery-stack shows
+  // — that column is always the photo/local-video carousel now. A click
+  // instead opens the embed in .hub__video-modal, layered on top of
+  // everything; this just tracks which one (if any) so the right
+  // .hub__media-item can read aria-current.
+  let modalVideoId: string | null = null;
+
+  function activeGalleryGrid(): HTMLElement | null {
+    return galleryWrap?.querySelector<HTMLElement>('.hub__gallery-grid:not([style*="none"])') ?? null;
+  }
+
+  // Wraps each paragraph's own content in an inline span so the highlight
+  // (see .hl in the CSS below) can live on that span instead of the <p> —
+  // moving its existing children rather than touching textContent/innerHTML
+  // keeps any inline markup (em, a, etc.) markdown produced intact.
+  panels?.querySelectorAll<HTMLParagraphElement>('.hub__panel p').forEach((p) => {
+    const span = document.createElement('span');
+    span.className = 'hl';
+    while (p.firstChild) span.appendChild(p.firstChild);
+    p.appendChild(span);
+  });
+
+  const MOBILE_BREAKPOINT = 768;
+  function isMobileLayout(): boolean {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+  }
+  function tileWidthPx(): number {
+    return isMobileLayout() ? window.innerWidth : window.innerWidth * 0.5;
+  }
+
+  // Shared by photos and videos alike — given just an aspect ratio (real
+  // natural ratio for a photo, a fixed 16/9 for an embed), returns the
+  // pixel box .hub__gallery-stack's next child should render at. Mobile
+  // just goes full width. Otherwise: fill the 50vw column at that ratio: if
+  // the resulting height already clears 85% of the page, that's enough on
+  // its own — flush to the bottom, .hub__gallery-stack's own --bg filling
+  // whatever's left above it. Past that threshold, scale up the rest of the
+  // way to cover the full height exactly (same math as object-fit:cover —
+  // whichever axis needs to grow more to satisfy BOTH width>=50vw and
+  // height>=100% wins, growing past 50vw and getting cropped symmetrically
+  // by .hub__gallery-stack's own overflow:hidden + align-items:center).
+  // A tile whose natural height at 50vw already clears the full viewport
+  // (a portrait-oriented video, say) doesn't get scaled at all here — it
+  // just renders at that full natural height, taller than the column. Flags
+  // that case as `overflow` so sizeTile (below) can center it instead of
+  // leaving column-reverse's default bottom-packing to clip only the top.
+  function sizeForRatio(ratio: number): { width: number; height: number; overflow: boolean } {
+    if (isMobileLayout()) {
+      return { width: window.innerWidth, height: window.innerWidth / ratio, overflow: false };
+    }
+    const containerWidthPx = tileWidthPx(); // 50vw
+    const containerHeightPx = window.innerHeight; // .hub__gallery-stack is top:0;bottom:0
+    const heightAtContainerWidth = containerWidthPx / ratio;
+    if (heightAtContainerWidth <= containerHeightPx * 0.85) {
+      return { width: containerWidthPx, height: heightAtContainerWidth, overflow: false };
+    }
+    if (heightAtContainerWidth >= containerHeightPx) {
+      return { width: containerWidthPx, height: heightAtContainerWidth, overflow: true };
+    }
+    return { width: containerHeightPx * ratio, height: containerHeightPx, overflow: false };
+  }
+
+  function sizeTile(el: HTMLElement, ratio: number) {
+    const { width, height, overflow } = sizeForRatio(ratio);
+    // Sized inline rather than via the scoped <style> below: an element
+    // created with document.createElement never gets Astro's scoping
+    // attribute, so a rule targeting it there would silently never match
+    // (confirmed — it rendered at natural size, ignoring the CSS entirely).
+    // max-width does still reach it, though — global.css's plain
+    // `img { max-width: 100% }` reset isn't scoped at all, and it silently
+    // clamped a tile grown past 640px back down to its 50vw flex container's
+    // width (confirmed) even with an explicit inline width. Overriding it
+    // inline too is what makes that explicit width actually stick.
+    el.style.display = 'block';
+    el.style.flex = 'none';
+    el.style.maxWidth = 'none';
+    el.style.width = `${width}px`;
+    el.style.height = `${height}px`;
+    // .hub__gallery-stack has no justify-content of its own, so it defaults
+    // to flex-start — with column-reverse that packs the tile flush to the
+    // bottom, clipping an overflowing tile only at the top. Switching to
+    // center here spreads that clipping evenly top and bottom instead
+    // (empty string on a non-overflowing tile just falls back to that same
+    // default, keeping the normal flush-bottom look unchanged).
+    if (galleryStack) galleryStack.style.justifyContent = overflow ? 'center' : '';
+  }
+
+  // A local gallery video (see renderStackVideo below) resizing in place
+  // instead of being torn down and recreated on a window resize — recreating
+  // it would restart playback from 0. Photos/gifs don't need this: there's
+  // no playback state to lose by swapping the element.
+  function resizeInPlace(matchDataset: string): boolean {
+    const child = galleryStack?.firstElementChild as HTMLVideoElement | undefined;
+    if (!child || child.dataset.src !== matchDataset) return false;
+    const ratio = child.videoWidth && child.videoHeight ? child.videoWidth / child.videoHeight : 16 / 9;
+    sizeTile(child, ratio);
+    return true;
+  }
+
+  // .hub__gallery-grid / .hub__gallery-img (in .hub__gallery-data) are never
+  // shown directly — they're a hidden data manifest this reads from (which
+  // item is "active" per piece, and each one's real URL via data-src, set
+  // only once actually needed since loading:lazy doesn't fire for a
+  // display:none element — it's never "near the viewport" for the browser
+  // to notice). The visible gallery is built here instead: the active item,
+  // flush to the bottom of the column (column-reverse packs a single child
+  // at its main-start, which is the bottom edge when reversed) — whatever
+  // space is left above it is just .hub__gallery-stack's own background
+  // (the page's neutral --bg, not transparent), not more copies of it.
+  function renderStack() {
+    if (!galleryStack) return;
+    const activeItem = activeGalleryGrid()?.querySelector<HTMLImageElement>('.hub__gallery-img:not([style*="none"])');
+    if (!activeItem) {
+      galleryStack.replaceChildren();
+      return;
+    }
+
+    if (activeItem.dataset.kind === 'video') {
+      renderStackVideo(activeItem);
+      return;
+    }
+
+    // Photo or gif — either way just a plain <img>, the browser animates a
+    // gif on its own once it's actually visible.
+    if (!activeItem.getAttribute('src') && activeItem.dataset.src) {
+      activeItem.addEventListener('load', renderStack, { once: true });
+      activeItem.src = activeItem.dataset.src;
+      return; // renderStack re-runs once it's actually loaded
+    }
+    if (!activeItem.complete || !activeItem.naturalWidth) {
+      activeItem.addEventListener('load', renderStack, { once: true });
+      return;
+    }
+
+    const tile = document.createElement('img');
+    tile.src = activeItem.src;
+    tile.alt = '';
+    tile.decoding = 'async';
+    sizeTile(tile, activeItem.naturalWidth / activeItem.naturalHeight);
+
+    galleryStack.replaceChildren(tile);
+  }
+
+  // A video file from the piece's own gallery folder (as opposed to the
+  // embedded YouTube/Vimeo piece opened in the popup by openVideoModal()
+  // below) — plays right in the gallery column, a plain <video> since this
+  // is a file the site hosts itself, not an iframe embed. There's no
+  // server-side probe for its dimensions (sharp can't read video), so it
+  // plays at an assumed 16:9 until its own metadata loads, then corrects
+  // to the real ratio.
+  function renderStackVideo(item: HTMLImageElement) {
+    if (!galleryStack) return;
+    const src = item.dataset.src;
+    if (!src) return;
+    if (resizeInPlace(src)) return;
+
+    const video = document.createElement('video');
+    video.dataset.src = src;
+    video.src = src;
+    video.autoplay = true;
+    video.loop = true;
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
+    sizeTile(video, 16 / 9);
+
+    video.addEventListener(
+      'loadedmetadata',
+      () => {
+        if (video.videoWidth && video.videoHeight) sizeTile(video, video.videoWidth / video.videoHeight);
+      },
+      { once: true },
+    );
+
+    galleryStack.replaceChildren(video);
+  }
+
+  // The embedded YouTube/Vimeo piece now opens as a centered popup instead
+  // of taking over .hub__gallery-stack — sized purely in CSS (a fixed
+  // aspect-ratio box on .hub__video-modal-frame), so unlike the gallery
+  // there's no per-resize JS needed to keep it fitted.
+  function openVideoModal(kind: string, id: string) {
+    if (!videoModal || !videoModalEmbed) return;
+    const embedSrc =
+      kind === 'vimeo'
+        ? `https://player.vimeo.com/video/${id}?dnt=1&title=0&byline=0&portrait=0&autoplay=1`
+        : `https://www.youtube-nocookie.com/embed/${id}?rel=0&autoplay=1`;
+
+    const iframe = document.createElement('iframe');
+    iframe.src = embedSrc;
+    iframe.title = kind === 'vimeo' ? 'Vimeo video' : 'YouTube video';
+    iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    iframe.allowFullscreen = true;
+    // Inline, not the scoped `.hub__video-modal-embed iframe` rule below —
+    // an element created with document.createElement never gets Astro's
+    // scoping attribute, so that rule silently never matched it (confirmed:
+    // the iframe was sitting at its browser-default 300x150, parked in the
+    // frame's top-left corner instead of filling it — exactly what read as
+    // "small video over on the left").
+    iframe.style.display = 'block';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+    iframe.style.border = '0';
+
+    videoModalEmbed.replaceChildren(iframe);
+    videoModal.hidden = false;
+    modalVideoId = id;
+    syncMediaUI();
+  }
+
+  // Clearing the embed (not just hiding the modal) is what actually stops
+  // playback — an iframe left in the DOM keeps playing behind a
+  // display:none parent.
+  function closeVideoModal() {
+    if (!videoModal) return;
+    videoModal.hidden = true;
+    videoModalEmbed?.replaceChildren();
+    modalVideoId = null;
+    syncMediaUI();
+  }
+
+  // Advances the data-manifest's "active" index for the current piece —
+  // wrapping around at either end — then rebuilds the visible stack for
+  // whatever photo that leaves active.
+  function showGalleryPhoto(grid: HTMLElement, index: number) {
+    const imgs = grid.querySelectorAll<HTMLImageElement>('.hub__gallery-img');
+    if (imgs.length === 0) return;
+    const wrapped = ((index % imgs.length) + imgs.length) % imgs.length;
+    imgs.forEach((img, i) => {
+      img.style.display = i === wrapped ? '' : 'none';
+    });
+    renderStack();
+  }
+
+  function stepGallery(delta: number) {
+    const grid = activeGalleryGrid();
+    if (!grid) return;
+    const current = grid.querySelector<HTMLElement>('.hub__gallery-img:not([style*="none"])');
+    const currentIndex = current ? Number(current.dataset.index) : 0;
+    showGalleryPhoto(grid, currentIndex + delta);
+  }
+
+  // Marks whichever .hub__media-item matches the video currently open in
+  // the popup (none, if it's closed).
+  function syncMediaUI() {
+    mediaNav?.querySelectorAll<HTMLButtonElement>('.hub__media-item').forEach((btn) => {
+      btn.setAttribute('aria-current', String(btn.dataset.videoId === modalVideoId));
+    });
+  }
+
+  function setActivePiece(id: string) {
+    document.querySelectorAll<HTMLButtonElement>('[data-piece-trigger]').forEach((btn) => {
+      btn.setAttribute('aria-current', String(btn.dataset.piece === id));
+    });
+
+    panels?.querySelectorAll<HTMLElement>('.hub__panel').forEach((panel) => {
+      panel.style.display = panel.dataset.piece === id ? '' : 'none';
+    });
+    if (panels) panels.scrollTop = 0;
+
+    mediaNav?.querySelectorAll<HTMLElement>('.hub__media-group').forEach((group) => {
+      group.style.display = group.dataset.piece === id ? '' : 'none';
+    });
+
+    socialNav?.querySelectorAll<HTMLElement>('.hub__social-group').forEach((group) => {
+      group.style.display = group.dataset.piece === id ? '' : 'none';
+    });
+
+    galleryWrap?.querySelectorAll<HTMLElement>('.hub__gallery-grid').forEach((grid) => {
+      const isActive = grid.dataset.piece === id;
+      grid.style.display = isActive ? '' : 'none';
+      if (isActive) showGalleryPhoto(grid, 0);
+    });
+
+    // Switching pieces always closes an open video popup — its
+    // .hub__media-group just got hidden anyway, and leaving the previous
+    // piece's video playing over the new piece's content wouldn't make
+    // sense.
+    closeVideoModal();
+  }
+
+  pieceNav?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-piece-trigger]');
+    if (!btn?.dataset.piece) return;
+    setActivePiece(btn.dataset.piece);
+  });
+
+  galleryPrev?.addEventListener('click', () => stepGallery(-1));
+  galleryNext?.addEventListener('click', () => stepGallery(1));
+
+  mediaNav?.addEventListener('click', (e) => {
+    const btn = (e.target as HTMLElement).closest<HTMLButtonElement>('.hub__media-item');
+    if (!btn?.dataset.videoId) return;
+    openVideoModal(btn.dataset.kind ?? 'youtube', btn.dataset.videoId);
+  });
+
+  videoModalClose?.addEventListener('click', closeVideoModal);
+
+  window.addEventListener('resize', () => {
+    renderStack();
+  });
+
+  // The gallery is the resting view from the moment the page loads — no
+  // click needed to reveal it.
+  renderStack();
+</script>
+
+<style>
+  .hub {
+    --bg: #f1f0eb;
+    --gallery-bg: #f9f8f4;
+    --ink: #17181a;
+    --ticker-h: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+
+    position: relative;
+    min-height: 100svh;
+    overflow: hidden;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+  }
+
+  /* ================================ topbar ================================ */
+
+  /* Two stacked rows (name+nav, then kicker+submenu) rather than a name/
+     kicker column beside a separately-positioned submenu — putting the
+     kicker and submenu in the same flex row is what actually keeps them on
+     one line together, instead of aligning one to the other with a guessed
+     offset. */
+  .hub__topbar {
+    position: fixed;
+    z-index: 5;
+    inset: 0 0 auto 0;
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+  }
+
+  .hub__row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem 2rem;
+  }
+
+  /* Everything below the name/nav row — piece submenu, video links, listen
+     links — stays confined to the left half of the page, leaving the right
+     half clear for .hub__gallery-stack. Constraining the width here, rather
+     than each row individually, is what keeps .hub__submenu's own flex:1
+     filling "the rest of this column" instead of "the rest of the page". */
+  .hub__left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    width: 50%;
+  }
+
+  .hub__name {
+    margin: 0;
+    font-family: 'Bitcount Prop Single', var(--mono);
+    font-style: normal;
+    font-weight: 500;
+    font-size: clamp(1rem, 0.8rem + 0.8vw, 1.375rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .hub__name a {
+    color: var(--ink);
+  }
+
+  .hub__kicker {
+    margin: 0;
+    font-style: italic;
+    line-height: 1;
+    font-size: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+  }
+
+  /* Only rendered when this hub also has a browsable "home" view (see
+     includeHubAsPiece — currently just baladí) — the kicker becomes a real
+     trigger back to it, with the same dim/bold active-state treatment as
+     .hub__submenu-item so switching to and from it reads the same way. */
+  .hub__kicker-btn {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--ink);
+    cursor: var(--cursor-clickable);
+    opacity: 0.55;
+    font-weight: 400;
+    transition: opacity 0.3s ease, font-weight 0.3s ease;
+  }
+
+  .hub__kicker-btn:hover,
+  .hub__kicker-btn:focus-visible {
+    opacity: 0.8;
+  }
+
+  .hub__kicker-btn[aria-current='true'] {
+    opacity: 1;
+    font-weight: 600;
+  }
+
+  .hub__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 50%;
+    margin-left: auto;
+    gap: 0.75rem 1.75rem;
+    font-style: italic;
+    font-size: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+  }
+
+  .hub__nav a {
+    color: var(--ink);
+    transition: opacity 0.3s ease;
+  }
+
+  .hub__nav a:hover,
+  .hub__nav a:focus-visible {
+    opacity: 0.6;
+  }
+
+  /* =============================== submenu ================================= */
+
+  /* Sits in the same row as the kicker (see .hub__row above), filling
+     whatever width is left after it — flex:1, not a fixed width — so the
+     hub's sub-pieces spread across nearly the full remaining line, right up
+     to the edge. The active one is bolder, not bigger: a font-size jump
+     doesn't transition smoothly (it reflows every sibling as it grows), a
+     font-weight change on this variable font does.
+
+     A grid rather than flex-wrap — flex-wrap breaks a row wherever content
+     happens to run out of space, so a hub with short piece names could fit
+     5+ per line while one with longer names fits 3. --submenu-cols (set
+     inline per hub, capped at 4 — see the Hub.astro frontmatter) fixes
+     exactly that many explicit column tracks; grid's own auto-placement
+     wraps anything past the 4th item onto a new row using those same
+     tracks, capping every hub at 4 per row regardless of label length.
+     justify-content:space-between then spreads those (auto-sized, not
+     stretched) tracks across the row the same way the old flex layout did. */
+  .hub__submenu {
+    --submenu-cols: 4;
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-columns: repeat(var(--submenu-cols), auto);
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.5rem 2rem;
+  }
+
+  .hub__submenu-item {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-style: italic;
+    color: var(--ink);
+    cursor: var(--cursor-clickable);
+    opacity: 0.55;
+    font-weight: 400;
+    font-size: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+    transition: opacity 0.3s ease, font-weight 0.3s ease;
+  }
+
+  .hub__submenu-item:hover,
+  .hub__submenu-item:focus-visible {
+    opacity: 0.8;
+  }
+
+  .hub__submenu-item[aria-current='true'] {
+    opacity: 1;
+    font-weight: 600;
+  }
+
+  /* ================================ panels ================================= */
+
+  /* No padding — confined to the left half of the page (matching .hub__left
+     above it), so it never runs behind .hub__gallery-stack on the right.
+     Starts 40% down the page and runs all the way down to the ticker,
+     rather than filling the space below the topbar. Text is top-aligned
+     within that band (flex-start) — short pieces just leave empty space
+     below rather than centering, and longer ones scroll (overflow-y: auto)
+     the same way either way. Scrollbar hidden (still scrolls via
+     wheel/touch/keyboard, just no visible track) across the three engines'
+     three different APIs for it. */
+  .hub__panels {
+    position: fixed;
+    z-index: 3;
+    left: 0;
+    right: 50%;
+    top: 40%;
+    bottom: var(--ticker-h);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* legacy Edge */
+  }
+
+  .hub__panels::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Chromium Edge */
+  }
+
+  /* Space is owned by each paragraph's own margin-top (not the previous
+     one's margin-bottom) so a single .tight paragraph can shrink just the
+     gap above itself without affecting its neighbours — see getPieceText's
+     splitParagraphs in src/lib/piece-text.ts: a live-parsed piece marks a
+     paragraph tight when exactly one blank line (not two-plus) separated
+     it from the one before, and that's rendered with a noticeably smaller
+     gap than the normal paragraph break. */
+  .hub__panel :global(p) {
+    margin: 0;
+    margin-top: 1.2em;
+    font-style: italic;
+    line-height: 1.55;
+    font-size: clamp(0.9375rem, 0.8rem + 0.3vw, 1.0625rem);
+  }
+
+  .hub__panel :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  .hub__panel :global(p.tight) {
+    margin-top: 0.4em;
+  }
+
+  /* Overrides global.css's plain h1/h2/h3 rule (monospace, unscoped, so it
+     otherwise leaks into markdown subheadings here) — a longer piece like
+     vistas' uses ## section breaks within its body copy, and those should
+     read as part of this serif/italic panel, not the site-wide mono type. */
+  .hub__panel :global(h2),
+  .hub__panel :global(h3) {
+    margin: 1.6em 0 0.6em;
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+    font-style: italic;
+    font-weight: 600;
+    line-height: 1.3;
+    font-size: clamp(1.0625rem, 0.9rem + 0.4vw, 1.25rem);
+  }
+
+  .hub__panel :global(h2:first-child),
+  .hub__panel :global(h3:first-child) {
+    margin-top: 0;
+  }
+
+  /* Highlight lives on an inner inline span (added in the script below), not
+     the <p> itself — a <p> stays block so paragraph gaps come from its own
+     margin above, same as before. If the background went on the <p> instead,
+     display:inline would be needed to hug each wrapped line's actual width
+     rather than filling the whole paragraph box (the full width of
+     .hub__panels — the "whole block of text filled by the background" look
+     that was reverted earlier); box-decoration-break:clone then reproduces
+     that background on every line fragment. But a fragment includes ANY
+     content nested inside that same box, including a generated blank line
+     used to fake paragraph spacing — so a lone ::after with "\A\A" for the
+     gap wrongly clones the highlight onto the blank line too (confirmed: it
+     does). Keeping the highlight scoped to a genuinely separate child
+     element sidesteps that. */
+  .hub__panel :global(p .hl) {
+    display: inline;
+    background: var(--bg);
+    padding: 0.05em 0.3em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  .hub__techniques {
+    margin: 1.6em 0 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3em;
+    font-style: italic;
+    font-size: clamp(0.875rem, 0.8rem + 0.2vw, 0.9375rem);
+  }
+
+  /* width: fit-content shrink-wraps the highlight to the row's own content
+     instead of the flex column's full stretched width. */
+  .hub__techniques div {
+    display: flex;
+    gap: 0.4em;
+    margin: 0;
+    width: fit-content;
+    background: var(--bg);
+    padding: 0.05em 0.3em;
+  }
+
+  .hub__techniques dt,
+  .hub__techniques dd {
+    margin: 0;
+  }
+
+  /* ================================ gallery ================================= */
+
+  /* A row of video titles for the active piece, sitting right under the
+     submenu in .hub__left (so still confined to the left half) — clicking
+     one swaps .hub__gallery-stack over to that video. Only one .hub__media-
+     group is visible at a time (toggled in the script above, same as
+     .hub__panel), and a piece with no videos just renders nothing here. */
+  .hub__media-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.4em 1.5rem;
+  }
+
+  .hub__media-item {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: inherit;
+    font-style: italic;
+    color: var(--ink);
+    cursor: var(--cursor-clickable);
+    font-size: clamp(0.9375rem, 0.8rem + 0.3vw, 1.0625rem);
+    transition: opacity 0.3s ease;
+  }
+
+  .hub__media-item:hover,
+  .hub__media-item:focus-visible {
+    opacity: 0.6;
+  }
+
+  .hub__media-item[aria-current='true'] {
+    opacity: 0.5;
+  }
+
+  /* Same row treatment as .hub__media-group, one level further down — one
+     .hub__social-group per piece (toggled in the script below, same as
+     .hub__media-group), only ever listing whichever of bandcamp/soundcloud/
+     spotify that piece actually has a link for. */
+  .hub__social-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.4em 1.5rem;
+  }
+
+  .hub__social-group a {
+    color: var(--ink);
+    font-style: italic;
+    font-size: clamp(0.9375rem, 0.8rem + 0.3vw, 1.0625rem);
+    transition: opacity 0.3s ease;
+  }
+
+  .hub__social-group a:hover,
+  .hub__social-group a:focus-visible {
+    opacity: 0.6;
+  }
+
+  /* Higher z-index than .hub__panels but lower than .hub__ticker — always
+     showing, bottom-right, and extends all the way to the true bottom of
+     the page (not stopping above the ticker) the same way .about__portrait
+     does: the ticker has a transparent background and a higher z-index, so
+     it still renders legibly on top wherever the two overlap. Wrapper
+     itself has no box (pointer-events off) — .hub__gallery-stack and the
+     two zone buttons opt back into hit-testing individually. */
+  .hub__gallery {
+    position: fixed;
+    z-index: 4;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hub__gallery-data {
+    display: none;
+  }
+
+  /* The active photo, flush to the bottom of the column (column-reverse
+     packs a single child at the bottom when reversed — see renderStack() in
+     the script above). Whatever space is left above it up to the top of the
+     viewport is filled with --gallery-bg (a touch lighter than the page's
+     own --bg, so the column still reads as a distinct area), not left
+     transparent, so it reads as a deliberate column rather than a gap.
+     top:0 + overflow:hidden caps the box's own height to the viewport, so a
+     photo taller than that (at this fixed width) is simply clipped at the
+     top edge rather than pushing the box (or the page) taller. */
+  .hub__gallery-stack {
+    position: fixed;
+    z-index: 4;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 50vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+    /* Only matters once renderStack() scales a tall photo past 50vw to
+       cover the full height — centers the crop so the excess width is cut
+       evenly off both sides instead of only the left. */
+    align-items: center;
+    background: var(--gallery-bg);
+    pointer-events: auto;
+  }
+
+  /* Each tile's width/height is set inline in JS, not here — see renderStack
+     in the script above (a dynamically created <img> never picks up Astro's
+     scoped-style attribute, so a rule targeting it here would silently never
+     match). */
+
+  /* Two invisible columns laid directly over .hub__gallery-stack's own
+     footprint (50vw wide, split evenly) to step back/forward through the
+     active piece's photos. */
+  .hub__gallery-zone {
+    position: fixed;
+    z-index: 4;
+    top: 0;
+    bottom: 0;
+    width: 25vw;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    pointer-events: auto;
+  }
+
+  .hub__gallery-zone--prev {
+    right: 25vw;
+    cursor: var(--cursor-prev);
+  }
+
+  .hub__gallery-zone--next {
+    right: 0;
+    cursor: var(--cursor-next);
+  }
+
+  /* ============================== video modal =============================== */
+
+  /* The embedded YouTube/Vimeo piece, centered over everything (highest
+     z-index on the page) rather than swapping into .hub__gallery-stack —
+     the gallery keeps showing whatever photo/local video it had underneath,
+     plainly visible. */
+  .hub__video-modal {
+    position: fixed;
+    z-index: 10;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .hub__video-modal[hidden] {
+    display: none;
+  }
+
+  /* No tint — just a blur, applied via backdrop-filter to whatever's
+     behind this layer (the gallery, topbar, text) rather than a color
+     painted on the layer itself. Doubles as the click-catcher that keeps
+     the gallery underneath unreachable while the video is up. */
+  .hub__video-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: none;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+
+  /* Fixed aspect-ratio box, sized purely in CSS — no JS resize handling
+     needed the way the gallery's cover-scaling requires, since this always
+     just fits inside the viewport at a constant ratio. Three candidate
+     widths, smallest wins: 69vw normally, capped at 1200px on a big
+     screen, or narrower still on a short/wide viewport — the third term
+     converts an 80vh budget into the equivalent width at 16:9, so the box
+     never grows taller than the viewport. */
+  .hub__video-modal-frame {
+    position: relative;
+    z-index: 1;
+    width: min(69vw, 1200px, calc(80vh * 16 / 9));
+    aspect-ratio: 16 / 9;
+  }
+
+  .hub__video-modal-embed,
+  .hub__video-modal-embed iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .hub__video-modal-close {
+    position: absolute;
+    z-index: 2;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(23, 24, 26, 0.6);
+    color: var(--bg);
+    font-family: inherit;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: var(--cursor-clickable);
+    transition: opacity 0.3s ease;
+  }
+
+  .hub__video-modal-close:hover,
+  .hub__video-modal-close:focus-visible {
+    opacity: 0.7;
+  }
+
+  /* ================================ ticker ================================ */
+
+  .hub__ticker {
+    position: fixed;
+    z-index: 5;
+    inset: auto 0 0 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-style: italic;
+    font-size: var(--ticker-h);
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .hub__ticker-track {
+    display: inline-flex;
+    width: max-content;
+    animation: hub-ticker-scroll 12s linear infinite;
+  }
+
+  .hub__ticker-item {
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+  }
+
+  .hub__ticker-sep {
+    opacity: 0.5;
+  }
+
+  @keyframes hub-ticker-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .hub__topbar {
+      position: static;
+      padding: 0 clamp(1.25rem, 5vw, 2rem);
+    }
+
+    .hub__nav {
+      width: auto;
+      margin-left: 0;
+    }
+
+    .hub__left {
+      width: auto;
+      padding: 0 0 1rem;
+    }
+
+    .hub__panels {
+      position: static;
+      bottom: auto;
+      max-height: none;
+      overflow-y: visible;
+    }
+
+    .hub__gallery {
+      position: relative;
+      z-index: auto;
+      padding: 0 clamp(1.25rem, 5vw, 2rem) 1.5rem;
+      pointer-events: auto;
+    }
+
+    .hub__gallery-stack {
+      position: static;
+      width: auto;
+      overflow: visible;
+      flex-direction: column;
+    }
+
+    .hub__gallery-zone {
+      position: absolute;
+      inset: 0;
+      top: auto;
+      height: 100%;
+      width: 50%;
+    }
+
+    .hub__gallery-zone--prev {
+      left: 0;
+      right: auto;
+    }
+
+    .hub__gallery-zone--next {
+      left: auto;
+      right: 0;
+    }
+
+    .hub__ticker {
+      position: relative;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hub__nav a,
+    .hub__kicker-btn,
+    .hub__submenu-item,
+    .hub__media-item,
+    .hub__video-modal-close {
+      transition: none;
+    }
+    .hub__ticker-track {
+      display: inline;
+      animation: none;
+    }
+    .hub__ticker-track > :nth-child(n + 3) {
+      display: none;
+    }
+    .hub__ticker {
+      text-overflow: ellipsis;
+    }
+  }
+</style>

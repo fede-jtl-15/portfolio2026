@@ -1,0 +1,106 @@
+*LINKS*
+soundcloud
+video
+
+*BODY*
+what do you see, when you see yourself?
+
+soy mi propia ausencia frente a un espejo roto
+- enrique lihn
+
+as a human being, I am capable of identifying myself in the mirror since I was six months old. this gave me a sense of self. since this moment, looking at myself has been a way to reaffirm my presence in the world.
+
+every day, I use my voice. It lets the world know who, where and when I am. In front of my reflection, I speak to myself, I am made of sound. I am sound, sound that shapes my relationship to the world I live in. my sound is me.
+
+my body grounds me to the planet and to my community, It places me in a specific time and space. through my body, I impact the space I inhabit. I am able to change and shape it.
+
+throughout history people have been changing the way we look at our presence in the world, Narcissus lost himself in his reflection, Magritte hid himself behind surreal objects, making us wonder what was behind what we could see. Ilse Bing showed us her fractured self through her photography, showing her ever evolving self through time. the list goes on.
+
+frente a un espejo roto invites people to find new meanings of their presence in space, as well as new ways of looking at their own reflection.
+
+
+description
+
+the installation invites people to think about their relationship to their own reflection, and to think of new ways of looking at their own presence in the space they inhabit.
+
+the reflective pond invites people to look at themselves (just as narcissus did), the performer’s presence and sound works against achieving this goal, distorting the reflection with every sound they produce. at the same time, the performers’ input generates sounds that  make the water move in captivating ways, as well as creating a digital “sound reflection”.
+
+the performers are faced with their visual reflection in the turbulent water, and a sound reflection, that is created by their presences and sounds while interacting with the piece. while the visual reflection is fleeting, and gets constantly distorted by their presence, the sound reflection is saved, stored and uploaded to the internet once the performer leaves the installation.
+
+
+transmedia
+
+while the piece was exhibited during manifest:io 2023 a generative image, driven by the viewers' interaction was created in touchdesigner and subsequently uploaded to the twitter account frente a un espejo roto (@therewhereimnot) with the location, date and time when it was created.
+
+the generative patch uses input from two microphones: one contact microphone on the floor, and a second one hanging above the pool of water. both the body and the voice of the performer is recorded and interpreted to create a unique digital sound reflection of the performer.
+
+the audio data is recorded and published as an archival piece to the soundcloud profile: @frente a un espejo roto.
+
+this audio serves as an archive of the presence of different people with the piece. the sound is distorted so that the words being spoken become indistinguishable, creating an ever evolving texture that maintains the essence of the messages left behind.
+
+
+background
+
+frente a un espejo roto is inspired by enrique lihn's poem 'la vejez de narciso'. in which the author reflects about losing himself in the mirror, about not recognizing himself anymore, he has become the thing that is missing in the mirror reflection.
+
+with the poem as a starting point the project focuses on the concept of the 'self ' and the impact and adaptability of it.
+the 'self' is divided into 3: the mind (sight), the soul (sound) and the body (movement):
+
+mind:
+
+in the mirror, I see myself there where I am not
+michel foucault
+
+what do you see, when you see yourself? when do you see? how? do you perceive yourself?
+
+every morning I see myself in the mirror, I see my eyes, my mouth, my skin, my hands, I see myself in the reflection of the reality that I inhabit. every day, I acknowledge my presence in the world.
+as the day passes I face myself in different reflections, in turbulent puddles on the streets, in blurry scenes reflecting from cars passing by, in the dreamy windows of shopping stores, these instances of myself are just temporary, they cease to exist as each moment passes. on the contrary, my presence in the world carries on.
+
+soul:
+
+todo reside en la voz. la muerte es, sobre todo, la ausencia de voz.
+annie ernaux
+
+what do you hear, when you hear yourself? when do you hear? how? do you perceive yourself?
+
+every day, my voice comes out from deep within me, it flows through me to allow me to project myself into the world, even if I only hear a distorted version of it in my head.
+some days, my voice breaks, others it resonates loudly in the spaces I exist in: classrooms, subways, streets, but every day my voice lets the world know who, where and when I am.
+my voice is one of the many sounds that I produce constantly. along with my heartbeat, my breath, and many others. I am made of sound, I am sound, sound that impacts the world I live in, my sound is me.
+
+body:
+
+soy mi propia ausencia frente a un espejo roto
+enrique lihn
+
+what do you feel, when you feel yourself? when do you feel? how? do you perceive yourself?
+
+my body carries me, it allows me to inhabit space and to navigate it. 
+while my body is a medium to be in this world, it also lets me establish connections with other beings through my sense of touch. through my body and movement, I am able to feel things that coexist with and around me.
+my body grounds me to this physical plane of existence, it grounds me gravitationally, and it grounds me to my community, it also places me in a specific time, my body decays, I persist. through my body I impact the space I inhabit, and I am able to change and shape it.
+
+the installation situates the 'self' as a whole in front of a mirror, by separating the different aspects it invites the viewer to become aware of their ‘selves’' in order to be able to alter himself. the installation is activated, with his presence (body), the viewers perceive themselves through their minds, and lastly they are able to modify what they see through their soul.
+
+
+la vejez de narciso
+
+enrique lihn
+
+me miro en el espejo y no veo mi rostro
+
+he desaparecido: el espejo es mi rostro.
+
+me he desaparecido;
+
+porque de tanto verme en este espejo roto
+
+he perdido el sentido de mi rostro
+
+o, de tanto contarlo, se me ha vuelto infinito
+
+o la nada que en él, como en todas las cosas,
+
+se ocultaba, lo oculta,
+
+la nada que está en todo, como el sol en la noche,
+
+y soy mi propia ausencia frente a un espejo roto

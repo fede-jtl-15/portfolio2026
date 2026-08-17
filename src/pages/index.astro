@@ -1,47 +1,347 @@
 ---
 import Base from '../layouts/Base.astro';
-import Index from '../components/Index.astro';
-import { SECTIONS, SITE } from '../lib/site';
-import { getWork } from '../lib/work';
+import { SITE } from '../lib/site';
+import { getHomeImages } from '../lib/home-images';
 
-const grouped = await Promise.all(
-  SECTIONS.map(async (s) => ({ section: s, entries: await getWork(s.id) })),
-);
+// Matches the routes used by the bespoke category pages (/live,
+// /interactive, /audiovisual — see src/components/CategoryIndex.astro)
+// rather than the older SECTIONS ids in src/lib/site.ts.
+const nav = [
+  { href: '/live', label: 'live visuals' },
+  { href: '/sound', label: 'sound' },
+  { href: '/interactive', label: 'installation' },
+  { href: '/audiovisual', label: 'audiovisual' },
+  { href: '/about', label: 'about' },
+];
 
-const [first, last] = SITE.name.split(' ');
+// Splitscreen aesthetic, same as the hub/category/about pages: an empty left
+// column, a fixed-width gallery column on the right. Every photo/gif/video
+// dropped into public/images/home shows up automatically — see
+// src/lib/home-images.ts.
+const images = await getHomeImages();
 ---
 
-<Base>
-  <section class="opener">
-    <div class="opener__hero field" style="--from:#2fc46a; --to:#e2379b;">
-      <span class="field__text">{first}&nbsp;&nbsp;{last}</span>
+<Base bare title="home">
+  <main class="hero">
+    <div class="hero__topbar">
+      <h1 class="hero__name"><a href="/"><span>{SITE.name}</span></a></h1>
+      <nav class="hero__nav" aria-label="sections">
+        {
+          nav.map((n) => (
+            <a href={n.href}>
+              <span>{n.label}</span>
+            </a>
+          ))
+        }
+      </nav>
     </div>
 
-    <h1>{SITE.role} <span class="aside">(2019—)</span></h1>
-    <p>
-      {/* Replace this with two or three sentences in your own voice. */}
-      radio, live sets, installations and video. made with musicians, and made
-      alone in rooms.
-    </p>
-  </section>
+    <div class="hero__gallery" id="hero-gallery">
+      <div class="hero__gallery-stack" id="hero-gallery-stack" />
+    </div>
+    <script type="application/json" id="hero-gallery-data" set:html={JSON.stringify(images)} />
 
-  {
-    grouped.map(({ section, entries }) => (
-      <section
-        class="section"
-        id={section.id}
-        style={`--from:${section.from}; --to:${section.to};`}
-      >
-        <div class="section__head">
-          <span class="section__n">{section.n}</span>
-          <h2 class="section__title">
-            <a href={`/${section.id}`}>{section.label}</a>
-          </h2>
-          <span class="aside">{section.aside}</span>
-          <p class="section__note">{section.note}</p>
-        </div>
-        <Index entries={entries} />
-      </section>
-    ))
-  }
+    <p class="hero__ticker" aria-label={SITE.description}>
+      <span class="hero__ticker-track" aria-hidden="true">
+        {
+          [0, 1].map(() => (
+            <>
+              <span class="hero__ticker-item">{SITE.description}</span>
+              <span class="hero__ticker-sep">*</span>
+            </>
+          ))
+        }
+      </span>
+    </p>
+  </main>
 </Base>
+
+<script>
+  interface HeroItem {
+    kind: 'image' | 'video';
+    src: string;
+    w: number;
+    h: number;
+  }
+
+  const galleryStack = document.getElementById('hero-gallery-stack');
+  const dataEl = document.getElementById('hero-gallery-data');
+  const images: HeroItem[] = dataEl?.textContent ? JSON.parse(dataEl.textContent) : [];
+
+  const MOBILE_BREAKPOINT = 768; // matches the 48rem breakpoint below
+  function isMobileLayout(): boolean {
+    return window.innerWidth <= MOBILE_BREAKPOINT;
+  }
+
+  // Same "cover past a threshold" technique as the project hub pages' own
+  // gallery column (see sizeForRatio in CoDeSusHub.astro) — fills this
+  // fixed 50vw column at the photo's natural ratio, scaling up past 85% of
+  // the viewport height to cover it exactly instead of leaving a gap of
+  // --gallery-bg above it.
+  function sizeForRatio(ratio: number): { width: number; height: number } {
+    if (isMobileLayout()) {
+      return { width: window.innerWidth, height: window.innerWidth / ratio };
+    }
+    const containerWidthPx = window.innerWidth * 0.5;
+    const containerHeightPx = window.innerHeight;
+    const heightAtContainerWidth = containerWidthPx / ratio;
+    if (heightAtContainerWidth <= containerHeightPx * 0.85) {
+      return { width: containerWidthPx, height: heightAtContainerWidth };
+    }
+    if (heightAtContainerWidth >= containerHeightPx) {
+      return { width: containerWidthPx, height: heightAtContainerWidth };
+    }
+    return { width: containerHeightPx * ratio, height: containerHeightPx };
+  }
+
+  function sizeTile(el: HTMLElement, ratio: number) {
+    const { width, height } = sizeForRatio(ratio);
+    // Sized inline, not via the scoped <style> below — see the identical
+    // note in CoDeSusHub.astro: a dynamically created element never gets
+    // Astro's scoping attribute, so a rule targeting it there would
+    // silently never match, and global.css's plain `img { max-width: 100% }`
+    // reset needs overriding inline too once a tile grows past 50vw.
+    el.style.display = 'block';
+    el.style.flex = 'none';
+    el.style.maxWidth = 'none';
+    el.style.width = `${width}px`;
+    el.style.height = `${height}px`;
+  }
+
+  let activeIndex = 0;
+  let currentTile: HTMLElement | null = null;
+
+  // Resizing only needs to resize the tile already on screen — recreating it
+  // (as renderActive below does) would restart a <video> tile from its first
+  // frame on every resize event and can retrigger the browser's autoplay
+  // check, observed to sometimes leave the video paused on its first frame
+  // instead of playing.
+  function resizeCurrentTile() {
+    const item = images[activeIndex];
+    if (!currentTile || !item) return;
+    sizeTile(currentTile, item.w / item.h);
+  }
+
+  function renderActive() {
+    if (!galleryStack) return;
+    const item = images[activeIndex];
+    if (!item) return;
+    let tile: HTMLElement;
+    if (item.kind === 'video') {
+      const video = document.createElement('video');
+      video.src = item.src;
+      video.autoplay = true;
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      tile = video;
+    } else {
+      const img = document.createElement('img');
+      img.src = item.src;
+      img.alt = '';
+      img.decoding = 'async';
+      tile = img;
+    }
+    sizeTile(tile, item.w / item.h);
+    galleryStack.replaceChildren(tile);
+    currentTile = tile;
+  }
+
+  window.addEventListener('resize', resizeCurrentTile);
+  renderActive();
+
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduceMotion && images.length > 1) {
+    // A plain rotation through the folder's photos — same instant swap (no
+    // crossfade) the hub pages use when switching between pieces.
+    setInterval(() => {
+      activeIndex = (activeIndex + 1) % images.length;
+      renderActive();
+    }, 6000);
+  }
+</script>
+
+<style>
+  .hero {
+    --bg: #f1f0eb;
+    --gallery-bg: #f9f8f4;
+    --ink: #17181a;
+    --ticker-h: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+
+    position: relative;
+    overflow: hidden;
+    min-height: 100svh;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Fraunces', ui-serif, Georgia, serif;
+  }
+
+  /* ================================ topbar ================================ */
+
+  .hero__topbar {
+    position: fixed;
+    z-index: 5;
+    inset: 0 0 auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.75rem 2rem;
+    padding: 0;
+  }
+
+  .hero__name {
+    margin: 0;
+    font-family: 'Bitcount Prop Single', var(--mono);
+    font-style: normal;
+    font-weight: 500;
+    font-size: clamp(1rem, 0.8rem + 0.8vw, 1.375rem);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+
+  .hero__name a {
+    color: var(--ink);
+  }
+
+  /* Spans the right half of the viewport (not the whole width) — items
+     space-between across that half, so the first lands at the horizontal
+     middle of the page and the last is flush with the right edge. */
+  .hero__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 50%;
+    margin-left: auto;
+    gap: 0.75rem 1.75rem;
+    font-style: italic;
+    font-size: clamp(0.9375rem, 0.8rem + 0.5vw, 1.125rem);
+  }
+
+  .hero__nav a {
+    color: var(--ink);
+    transition: opacity 0.3s ease;
+  }
+
+  .hero__nav a:hover,
+  .hero__nav a:focus-visible {
+    opacity: 0.6;
+  }
+
+  /* ================================ gallery ================================ */
+
+  /* Same treatment as the hub pages' image column (.hub__gallery-stack): a
+     fixed 50vw-wide strip flush to the right edge, full viewport height. The
+     left half stays empty — no text, no panel, just the page background —
+     that's the "splitscreen" look this page is matching. */
+  .hero__gallery {
+    position: fixed;
+    z-index: 4;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .hero__gallery-stack {
+    position: fixed;
+    z-index: 4;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 50vw;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    background: var(--gallery-bg);
+  }
+
+  /* Each tile's width/height is set inline in JS — see sizeTile in the
+     script above (a dynamically created <img> never picks up Astro's
+     scoped-style attribute, so a rule targeting it here would silently
+     never match). */
+
+  /* ================================ ticker ================================ */
+
+  .hero__ticker {
+    position: fixed;
+    z-index: 5;
+    inset: auto 0 0 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    font-style: italic;
+    font-size: var(--ticker-h);
+    line-height: 1;
+    color: var(--ink);
+  }
+
+  .hero__ticker-track {
+    display: inline-flex;
+    width: max-content;
+    animation: hero-ticker-scroll 12s linear infinite;
+  }
+
+  .hero__ticker-item {
+    padding: 0 clamp(1.25rem, 5vw, 3.5rem);
+  }
+
+  .hero__ticker-sep {
+    opacity: 0.5;
+  }
+
+  @keyframes hero-ticker-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .hero__topbar {
+      position: static;
+      padding: 0 clamp(1.25rem, 5vw, 2rem);
+    }
+
+    .hero__nav {
+      width: auto;
+      margin-left: 0;
+    }
+
+    .hero__gallery {
+      position: relative;
+      z-index: auto;
+      padding: 1.5rem clamp(1.25rem, 5vw, 2rem);
+      pointer-events: auto;
+    }
+
+    .hero__gallery-stack {
+      position: static;
+      width: auto;
+      overflow: visible;
+      flex-direction: column;
+    }
+
+    .hero__ticker {
+      position: relative;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__nav a {
+      transition: none;
+    }
+    .hero__ticker-track {
+      display: inline;
+      animation: none;
+    }
+    .hero__ticker-track > :nth-child(n + 3) {
+      display: none;
+    }
+    .hero__ticker {
+      text-overflow: ellipsis;
+    }
+  }
+</style>
