@@ -11,9 +11,13 @@ r2-credentials.txt
 # Generated on every build from public/images/** — regenerated fresh by the
 # Cloudflare Pages build itself, not needed in git. Currently several GB;
 # committing it would bloat every future clone for no benefit. Catches every
-# "strip" cache dir (proyectos/strip, proyectos/<category>/strip,
-# home/strip, ...), not just the ones that exist today.
-public/images/**/strip/
+# compressed-derivative cache dir (proyectos/cache, home/cache, ...), not
+# just the ones that exist today. Named "cache" rather than the earlier
+# "strip" on purpose — Cloudflare Pages' deploy-upload step was silently
+# dropping every file under any directory literally named "strip" from the
+# published output (confirmed: renaming fixed it, page/asset paths outside
+# a "strip" dir deployed fine throughout), whatever the exact mechanism.
+public/images/**/cache/
 
 # Unused scratch folder of candidate landing-page images (226MB, not read by
 # any current page/component — grepped for references, found none). Kept on

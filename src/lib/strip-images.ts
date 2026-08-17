@@ -10,7 +10,7 @@ import { isCacheFresh, recordCacheFresh } from './fingerprint';
  * into one of the four category folders and it shows up on the next
  * dev-server request or build, no code changes needed.
  *
- * Each source image is compressed into public/images/proyectos/strip/ the
+ * Each source image is compressed into public/images/proyectos/cache/ the
  * first time it's seen, and re-compressed if the source is ever replaced
  * (same filename, new content — see src/lib/fingerprint.ts) — since the
  * originals can be many MB and are shown here as small stills. Sourced from
@@ -31,7 +31,7 @@ const CATEGORY_SECTION: Record<string, SectionId> = {
 };
 
 const SOURCE_DIR = path.join(process.cwd(), 'assets');
-const STRIP_DIR = path.join(process.cwd(), 'public/images/proyectos/strip');
+const STRIP_DIR = path.join(process.cwd(), 'public/images/proyectos/cache');
 const IMAGE_RE = /\.(jpe?g|png)$/i;
 
 function slugify(name: string) {
@@ -116,7 +116,7 @@ export async function getStripImages(): Promise<StripImage[]> {
       const match = findWorkMatch(work, base);
 
       results.push({
-        src: `/images/proyectos/strip/${outName}`,
+        src: `/images/proyectos/cache/${outName}`,
         title: match ? String(match.data.title) : humanize(base),
         href: match ? `/work/${match.id}` : `/${sectionById(sectionId).id}`,
         w: dims.width,

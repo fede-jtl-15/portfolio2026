@@ -16,7 +16,7 @@ import path from 'node:path';
  * worth guarding against.
  *
  * One small JSON manifest per cache directory (not a fingerprint baked into
- * each filename) keeps every existing `/strip/...` URL stable — nothing
+ * each filename) keeps every existing cached-asset URL stable — nothing
  * downstream that matches on filename needs to change.
  */
 

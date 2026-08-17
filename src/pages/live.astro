@@ -30,10 +30,10 @@ const LIVE_FILE_HREF: Record<string, string> = {
 };
 
 const allStrip = await getStripImages();
-const liveImages = allStrip.filter((img) => img.src.includes('/strip/live-'));
+const liveImages = allStrip.filter((img) => img.src.includes('/cache/live-'));
 const imageByHref = new Map<string, (typeof liveImages)[number]>();
 for (const img of liveImages) {
-  const base = img.src.match(/\/strip\/live-(.+)\.jpg$/)?.[1] ?? '';
+  const base = img.src.match(/\/cache\/live-(.+)\.jpg$/)?.[1] ?? '';
   const href = base.startsWith('reflected_radio') ? '/work/reflected-radio' : LIVE_FILE_HREF[base];
   if (!href || imageByHref.has(href)) continue; // one representative image per project is enough here
   imageByHref.set(href, img);

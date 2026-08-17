@@ -10,7 +10,7 @@ import { preparedVideo } from './video-prep';
  * collection schema), read by convention from assets/<relDir>/ — the file
  * named "*_background.*" is the background image, every other photo/gif/
  * video in that folder is a gallery item. Compressed copies of photos and
- * gifs are cached in public/images/proyectos/strip/hub/ the first time each
+ * gifs are cached in public/images/proyectos/cache/hub/ the first time each
  * source is seen, since originals here run up to ~50MB, and regenerated
  * whenever the source file is replaced (see src/lib/fingerprint.ts) — so
  * replacing a file (same filename, new content) is picked up on the next
@@ -43,7 +43,7 @@ import { preparedVideo } from './video-prep';
  */
 
 const SOURCE_DIR = path.join(process.cwd(), 'assets');
-const CACHE_DIR = path.join(process.cwd(), 'public/images/proyectos/strip/hub');
+const CACHE_DIR = path.join(process.cwd(), 'public/images/proyectos/cache/hub');
 const IMAGE_RE = /\.(jpe?g|png)$/i;
 const GIF_RE = /\.gif$/i;
 const VIDEO_RE = /\.(mp4|m4v|mov|webm)$/i;
@@ -145,7 +145,7 @@ export async function getHubAssets(relDir: string): Promise<HubAssets> {
           await preparedVideo(inPath, outPath);
           recordCacheFresh(CACHE_DIR, inPath, outName);
         }
-        gallery.push({ kind: 'video', src: `/images/proyectos/strip/hub/${outName}` });
+        gallery.push({ kind: 'video', src: `/images/proyectos/cache/hub/${outName}` });
       } catch (err) {
         // No public fallback to link to any more — the source lives under
         // assets/, outside public/, precisely so it's never served as-is.
@@ -193,7 +193,7 @@ export async function getHubAssets(relDir: string): Promise<HubAssets> {
       console.warn(`[hub-assets] skipping unreadable file: ${inPath}`, err);
       continue;
     }
-    const img: HubImage = { kind: 'image', src: `/images/proyectos/strip/hub/${outName}`, w: dims.width, h: dims.height };
+    const img: HubImage = { kind: 'image', src: `/images/proyectos/cache/hub/${outName}`, w: dims.width, h: dims.height };
 
     if (isBackground) background = img;
     else gallery.push(img);

@@ -8,7 +8,7 @@ import { preparedVideo, probeVideo } from './video-prep';
 /**
  * Homepage gallery column — every photo/gif/video dropped into
  * public/images/home shows up automatically, no code changes needed.
- * Compressed/prepared copies are cached in public/images/home/strip/ the
+ * Compressed/prepared copies are cached in public/images/home/cache/ the
  * first time each source is seen, and regenerated whenever the source file
  * is replaced (same convention as getStripImages/getHubAssets — see
  * src/lib/fingerprint.ts).
@@ -21,7 +21,7 @@ import { preparedVideo, probeVideo } from './video-prep';
  */
 
 const HOME_DIR = path.join(process.cwd(), 'public/images/home');
-const CACHE_DIR = path.join(HOME_DIR, 'strip');
+const CACHE_DIR = path.join(HOME_DIR, 'cache');
 const GIF_RE = /\.gif$/i;
 const VIDEO_RE = /\.(mp4|m4v|mov|webm)$/i;
 const MEDIA_RE = /\.(jpe?g|png|gif|mp4|m4v|mov|webm)$/i;
@@ -78,7 +78,7 @@ export async function getHomeImages(): Promise<HomeMedia[]> {
           dims = await preparedVideo(inPath, outPath);
           recordCacheFresh(CACHE_DIR, inPath, outName);
         }
-        items.push({ kind: 'video', src: `/images/home/strip/${outName}`, w: dims.width ?? 1280, h: dims.height ?? 1280 });
+        items.push({ kind: 'video', src: `/images/home/cache/${outName}`, w: dims.width ?? 1280, h: dims.height ?? 1280 });
         continue;
       }
 
@@ -107,7 +107,7 @@ export async function getHomeImages(): Promise<HomeMedia[]> {
         dims = { width: info.width, height: info.height };
         recordCacheFresh(CACHE_DIR, inPath, outName);
       }
-      items.push({ kind: 'image', src: `/images/home/strip/${outName}`, w: dims.width, h: dims.height });
+      items.push({ kind: 'image', src: `/images/home/cache/${outName}`, w: dims.width, h: dims.height });
     } catch (err) {
       console.warn(`[home-images] skipping unreadable file: ${inPath}`, err);
     }

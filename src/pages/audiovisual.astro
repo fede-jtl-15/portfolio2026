@@ -38,10 +38,10 @@ const AV_FILE_HREF: Record<string, string> = {
 };
 
 const allStrip = await getStripImages();
-const avImages = allStrip.filter((img) => img.src.includes('/strip/audiovisual-'));
+const avImages = allStrip.filter((img) => img.src.includes('/cache/audiovisual-'));
 const imageByHref = new Map<string, (typeof avImages)[number]>();
 for (const img of avImages) {
-  const base = img.src.match(/\/strip\/audiovisual-(.+)\.jpg$/)?.[1] ?? '';
+  const base = img.src.match(/\/cache\/audiovisual-(.+)\.jpg$/)?.[1] ?? '';
   const href = AV_FILE_HREF[base];
   if (!href || imageByHref.has(href)) continue;
   imageByHref.set(href, img);

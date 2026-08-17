@@ -12,7 +12,7 @@ const projects = [
 ];
 
 const allStrip = await getStripImages();
-const soundImages = allStrip.filter((img) => img.src.includes('/strip/sound-'));
+const soundImages = allStrip.filter((img) => img.src.includes('/cache/sound-'));
 const imageByHref = new Map<string, (typeof soundImages)[number]>();
 for (const img of soundImages) {
   if (!imageByHref.has(img.href)) imageByHref.set(img.href, img);

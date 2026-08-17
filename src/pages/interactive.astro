@@ -12,7 +12,7 @@ const projects = [
 ];
 
 const allStrip = await getStripImages();
-const installationImages = allStrip.filter((img) => img.src.includes('/strip/installation-'));
+const installationImages = allStrip.filter((img) => img.src.includes('/cache/installation-'));
 const imageByHref = new Map<string, (typeof installationImages)[number]>();
 for (const img of installationImages) {
   if (!imageByHref.has(img.href)) imageByHref.set(img.href, img);
