@@ -18,8 +18,7 @@ const projects = work
 // (see findWorkMatch in src/lib/strip-images.ts), which fails for a couple
 // of these — the source photo is named after the old id or the blurb, not
 // the current one. Mapped by hand instead of trusting that match, so they
-// aren't silently dropped. visual_jockey has no photo uploaded yet, so it
-// renders without a hover preview.
+// aren't silently dropped.
 const LIVE_FILE_HREF: Record<string, string> = {
   hologramas: '/work/hologramas',
   late_night_ambient: '/work/late-night-ambient',
@@ -27,6 +26,7 @@ const LIVE_FILE_HREF: Record<string, string> = {
   scenes_from_a_memory: '/work/scenes-from-a-memory',
   transit_cadence: '/work/transit-cadence',
   mutek: '/work/mutek',
+  visual_jockey: '/work/visual-jockey',
 };
 
 const allStrip = await getStripImages();

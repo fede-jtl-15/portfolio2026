@@ -34,13 +34,21 @@ const personLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
   name: SITE.fullName,
-  alternateName: SITE.name,
+  alternateName: [SITE.name, ...SITE.alternateNames],
   url: SITE.url,
   image: ogImageUrl,
   email: `mailto:${SITE.email}`,
-  jobTitle: SITE.role,
-  description: SITE.description,
-  sameAs: SOCIALS.map((s) => s.href),
+  jobTitle: SITE.jobTitle,
+  description: SITE.personDescription,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: SITE.address.locality,
+    addressCountry: SITE.address.country,
+  },
+  // The youtube entry in SOCIALS links to one specific video, not a
+  // channel/profile — not something sameAs should claim represents this
+  // person, unlike the rest of SOCIALS.
+  sameAs: SOCIALS.filter((s) => s.label !== 'youtube').map((s) => s.href),
 };
 ---
 

@@ -122,8 +122,26 @@ const pageTitle = requestedPiece ? requestedPiece.title : hubEntry.data.title;
 // its own markdown body instead of a live text file (see textFile in
 // content.config.ts) and so has no pieceText to pull from; falls all the
 // way back to Base's own generic default only if neither exists yet.
-function truncate(text: string): string {
-  return text.length > 155 ? `${text.slice(0, 155).replace(/\s+\S*$/, '')}…` : text;
+// Words that shouldn't be left dangling at a truncation cut — articles,
+// prepositions, conjunctions — since ending on one reads as an abrupt
+// mid-thought stop even though it's a whole word.
+const DANGLING_WORDS = new Set([
+  'a', 'an', 'the', 'of', 'in', 'on', 'at', 'to', 'for', 'and', 'or', 'with',
+  'by', 'is', 'as', 'its', 'it', 'that', 'this', 'from', 'into', 'than', 'but',
+]);
+function truncate(text: string, maxLength = 155): string {
+  if (text.length <= maxLength) return text;
+  const slice = text.slice(0, maxLength);
+  // Prefer a full sentence if one ends reasonably close to the limit —
+  // reads as a complete thought rather than an arbitrary cutoff.
+  const sentenceEnd = Math.max(slice.lastIndexOf('. '), slice.lastIndexOf('! '), slice.lastIndexOf('? '));
+  if (sentenceEnd > maxLength * 0.6) return slice.slice(0, sentenceEnd + 1);
+  // Otherwise back off to the last whole word, then keep backing off past
+  // any dangling article/preposition/conjunction so the cut doesn't end on
+  // a word that reads as expecting more to follow.
+  const words = slice.replace(/\s+\S*$/, '').split(/\s+/);
+  while (words.length > 3 && DANGLING_WORDS.has(words[words.length - 1].toLowerCase())) words.pop();
+  return `${words.join(' ')}…`;
 }
 function toDescription(paragraphs: { html: string }[] | undefined, blurb: string | undefined): string | undefined {
   const text = paragraphs?.[0]?.html.replace(/<[^>]+>/g, '').trim();

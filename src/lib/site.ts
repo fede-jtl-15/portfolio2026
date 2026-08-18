@@ -5,9 +5,20 @@ export const SITE = {
   // data (see Base.astro) — kept separate from `name` above since that one
   // stays lowercase everywhere it's actually rendered on the page.
   fullName: 'Federico Torres',
+  // Other forms this person is known by — the stylized handle and the full
+  // legal name — for JSON-LD Person.alternateName, so a knowledge panel can
+  // disambiguate from other people who share the plain "Federico Torres" name.
+  alternateNames: ['co_de_sus', 'Federico de Jesús Torres López'],
+  jobTitle: 'New Media Artist',
+  address: { locality: 'Berlin', country: 'DE' },
   role: 'sound, performance, audiovisual',
   description:
     'time-based media to explore abstraction focusing on the ephemeral and ever-changing nature of time and memory.',
+  // A plain factual sentence for JSON-LD/search consumption — the poetic
+  // tagline above (`description`) reads well as on-page copy but doesn't
+  // work as a structured-data bio.
+  personDescription:
+    'New media artist and designer working in sound, interactive installations & performance, audiovisual & experimental film, and art direction.',
   email: 'fede.jtl.torres.3@gmail.com',
   url: 'https://federico-torres.com',
 };
