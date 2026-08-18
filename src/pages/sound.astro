@@ -24,4 +24,10 @@ for (const img of soundImages) {
 const entries: CategoryEntry[] = projects.map((p) => ({ ...p, image: imageByHref.get(p.href) }));
 ---
 
-<CategoryIndex title="sound" kicker="sound" currentHref="/sound" entries={entries} />
+<CategoryIndex
+  title="sound"
+  kicker="sound"
+  currentHref="/sound"
+  entries={entries}
+  description="Federico Torres — composed and recorded sound work, including the baladí radio series."
+/>

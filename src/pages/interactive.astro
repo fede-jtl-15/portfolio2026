@@ -27,4 +27,10 @@ for (const img of installationImages) {
 const entries: CategoryEntry[] = projects.map((p) => ({ ...p, image: imageByHref.get(p.href) }));
 ---
 
-<CategoryIndex title="interactive" kicker="interactive / instalación" currentHref="/interactive" entries={entries} />
+<CategoryIndex
+  title="interactive"
+  kicker="interactive / instalación"
+  currentHref="/interactive"
+  entries={entries}
+  description="Federico Torres — interactive installation work that responds to a space and the people in it."
+/>

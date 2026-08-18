@@ -50,4 +50,10 @@ for (const img of avImages) {
 const entries: CategoryEntry[] = projects.map((p) => ({ ...p, image: imageByHref.get(p.href) }));
 ---
 
-<CategoryIndex title="audiovisual" kicker="audiovisual" currentHref="/audiovisual" entries={entries} />
+<CategoryIndex
+  title="audiovisual"
+  kicker="audiovisual"
+  currentHref="/audiovisual"
+  entries={entries}
+  description="Federico Torres — audiovisual and experimental film work made with and for other artists."
+/>

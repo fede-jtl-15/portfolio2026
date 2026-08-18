@@ -72,6 +72,7 @@ async function buildPiece(entry: (typeof sourceEntries)[number], relDir: string)
     techniques: entry.data.techniques,
     media: entry.data.media,
     links: entry.data.links,
+    blurb: entry.data.blurb,
     Content,
     pieceText,
     gallery: assets.gallery.length > 0 ? assets.gallery : PLACEHOLDER_GALLERY,
@@ -110,10 +111,29 @@ const submenuWraps = subPieces.length > SUBMENU_ROW_MAX;
 // whichever piece happens to be first.
 const initialId = initialPieceId ?? homePiece?.id ?? pieces[0]?.id;
 const requestedPiece = initialPieceId ? pieces.find((p) => p.id === initialPieceId) : undefined;
+const activePiece = requestedPiece ?? pieces[0];
 const pageTitle = requestedPiece ? requestedPiece.title : hubEntry.data.title;
+
+// A real, piece-specific meta description beats the same generic
+// site-wide tagline on every one of these pages — pulled from the piece's
+// own first paragraph (its actual live text, see piece-text.ts) rather
+// than hand-written per page, so it stays accurate if that text changes.
+// Falls back to the entry's own `blurb`, for the rare piece that renders
+// its own markdown body instead of a live text file (see textFile in
+// content.config.ts) and so has no pieceText to pull from; falls all the
+// way back to Base's own generic default only if neither exists yet.
+function truncate(text: string): string {
+  return text.length > 155 ? `${text.slice(0, 155).replace(/\s+\S*$/, '')}…` : text;
+}
+function toDescription(paragraphs: { html: string }[] | undefined, blurb: string | undefined): string | undefined {
+  const text = paragraphs?.[0]?.html.replace(/<[^>]+>/g, '').trim();
+  if (text) return truncate(text);
+  return blurb ? truncate(blurb) : undefined;
+}
+const pageDescription = toDescription(activePiece?.pieceText?.bodyParagraphs, activePiece?.blurb);
 ---
 
-<Base bare title={pageTitle}>
+<Base bare title={pageTitle} description={pageDescription}>
   <main class="hub">
     <div class="hub__topbar">
       <div class="hub__row">

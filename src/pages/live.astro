@@ -42,4 +42,10 @@ for (const img of liveImages) {
 const entries: CategoryEntry[] = projects.map((p) => ({ ...p, image: imageByHref.get(p.href) }));
 ---
 
-<CategoryIndex title="live" kicker="live visuals" currentHref="/live" entries={entries} />
+<CategoryIndex
+  title="live"
+  kicker="live visuals"
+  currentHref="/live"
+  entries={entries}
+  description="Federico Torres — live audiovisual sets, radio broadcasts, and durational performance work."
+/>

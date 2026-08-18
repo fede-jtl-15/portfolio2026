@@ -21,9 +21,10 @@ interface Props {
   kicker: string;
   currentHref: string;
   entries: CategoryEntry[];
+  description?: string;
 }
 
-const { title, kicker, currentHref, entries } = Astro.props;
+const { title, kicker, currentHref, entries, description } = Astro.props;
 
 const nav = [
   { href: '/live', label: 'live visuals' },
@@ -34,7 +35,7 @@ const nav = [
 ];
 ---
 
-<Base bare title={title}>
+<Base bare title={title} description={description}>
   <main class="catpage">
     <div class="catpage__topbar">
       <div class="catpage__brand">

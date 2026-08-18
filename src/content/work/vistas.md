@@ -4,6 +4,7 @@ title: vistas
 section: interactive
 order: 3
 format: installation
+blurb: An interactive performance exhibition exploring how we can alter, extend, or distort our physical selves to reshape how we perceive.
 media: []
 links:
   - label: research
