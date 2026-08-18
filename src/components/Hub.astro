@@ -89,6 +89,19 @@ const subPieces = await Promise.all(
 const homePiece = includeHubAsPiece && isRealHub ? await buildPiece(hubEntry, folder) : null;
 const pieces = homePiece ? [homePiece, ...subPieces] : subPieces;
 
+// A hub with more pieces than fit in one row (currently just baladí, at
+// 17) moves its whole submenu out from beside the kicker and onto its own
+// full-width line below — rather than only the overflow rows, since even
+// a single row of SUBMENU_ROW_MAX pieces is too wide to actually fit next
+// to the kicker in .hub__left's own column width, so trying to keep row 1
+// there and only break out later rows was fighting flex-wrap's own
+// (viewport-dependent, not reliably predictable) line-breaking rather
+// than just deciding it outright. Keeps every hub with SUBMENU_ROW_MAX or
+// fewer pieces (everything today except baladí) on the original single
+// line beside the kicker, unchanged.
+const SUBMENU_ROW_MAX = 8;
+const submenuWraps = subPieces.length > SUBMENU_ROW_MAX;
+
 // Falls back to the home piece (if this hub has one) or the first sub-piece
 // otherwise, when no prop is passed — the plain hub route, or any
 // standalone entry, which only ever has one piece regardless. The title
@@ -129,12 +142,12 @@ const pageTitle = requestedPiece ? requestedPiece.title : hubEntry.data.title;
             }
           </p>
           {
-            isRealHub && (
+            isRealHub && !submenuWraps && (
               <nav
                 class="hub__submenu"
                 id="hub-submenu"
                 aria-label={`${hubEntry.data.title} pieces`}
-                style={`--submenu-cols:${Math.min(subPieces.length, 6)}`}
+                style={`--submenu-cols:${Math.min(subPieces.length, SUBMENU_ROW_MAX)}`}
               >
                 {subPieces.map((p) => (
                   <button type="button" class="hub__submenu-item" data-piece={p.id} data-piece-trigger aria-current={p.id === initialId ? 'true' : 'false'}>
@@ -145,6 +158,23 @@ const pageTitle = requestedPiece ? requestedPiece.title : hubEntry.data.title;
             )
           }
         </div>
+
+        {
+          isRealHub && submenuWraps && (
+            <nav
+              class="hub__submenu"
+              id="hub-submenu"
+              aria-label={`${hubEntry.data.title} pieces`}
+              style={`--submenu-cols:${SUBMENU_ROW_MAX}`}
+            >
+              {subPieces.map((p) => (
+                <button type="button" class="hub__submenu-item" data-piece={p.id} data-piece-trigger aria-current={p.id === initialId ? 'true' : 'false'}>
+                  {p.title}
+                </button>
+              ))}
+            </nav>
+          )
+        }
 
         <div class="hub__media-nav" id="hub-media-nav">
           {
@@ -711,24 +741,31 @@ const pageTitle = requestedPiece ? requestedPiece.title : hubEntry.data.title;
 
   /* =============================== submenu ================================= */
 
-  /* Sits in the same row as the kicker (see .hub__row above), filling
-     whatever width is left after it — flex:1, not a fixed width — so the
-     hub's sub-pieces spread across nearly the full remaining line, right up
-     to the edge. The active one is bolder, not bigger: a font-size jump
+  /* Normally sits in the same row as the kicker (.hub__row above), filling
+     whatever width is left after it — flex:1, not a fixed width — so a
+     hub's sub-pieces (up to SUBMENU_ROW_MAX) spread across nearly the full
+     remaining line, right up to the edge. A hub with more pieces than that
+     (see submenuWraps in the frontmatter) instead renders this as its own
+     full-width line below .hub__row rather than beside the kicker — as a
+     column-flex child of .hub__left rather than a row sibling of the
+     kicker, flex:1 there means stretching to that column's full width, not
+     yielding room to the kicker, so every row (not just the overflow ones)
+     starts flush left instead of carrying the kicker's width as an indent.
+     The active piece is bolder, not bigger, either way: a font-size jump
      doesn't transition smoothly (it reflows every sibling as it grows), a
      font-weight change on this variable font does.
 
      A grid rather than flex-wrap — flex-wrap breaks a row wherever content
      happens to run out of space, so a hub with short piece names could fit
-     5+ per line while one with longer names fits 3. --submenu-cols (set
-     inline per hub, capped at 6 — see the Hub.astro frontmatter) fixes
-     exactly that many explicit column tracks; grid's own auto-placement
-     wraps anything past the 6th item onto a new row using those same
-     tracks, capping every hub at 6 per row regardless of label length.
-     justify-content:space-between then spreads those (auto-sized, not
-     stretched) tracks across the row the same way the old flex layout did. */
+     9+ per line while one with longer names fits 5. --submenu-cols (set
+     inline per hub, capped at SUBMENU_ROW_MAX) fixes exactly that many
+     explicit column tracks; grid's own auto-placement wraps anything past
+     the last column onto a new row using those same tracks, capping every
+     row at that count regardless of label length. justify-content:
+     space-between then spreads those (auto-sized, not stretched) tracks
+     across the row the same way the old flex layout did. */
   .hub__submenu {
-    --submenu-cols: 6;
+    --submenu-cols: 8;
     flex: 1 1 auto;
     display: grid;
     grid-template-columns: repeat(var(--submenu-cols), auto);
