@@ -134,7 +134,7 @@ const pageTitle = requestedPiece ? requestedPiece.title : hubEntry.data.title;
                 class="hub__submenu"
                 id="hub-submenu"
                 aria-label={`${hubEntry.data.title} pieces`}
-                style={`--submenu-cols:${Math.min(subPieces.length, 4)}`}
+                style={`--submenu-cols:${Math.min(subPieces.length, 6)}`}
               >
                 {subPieces.map((p) => (
                   <button type="button" class="hub__submenu-item" data-piece={p.id} data-piece-trigger aria-current={p.id === initialId ? 'true' : 'false'}>
@@ -721,14 +721,14 @@ const pageTitle = requestedPiece ? requestedPiece.title : hubEntry.data.title;
      A grid rather than flex-wrap — flex-wrap breaks a row wherever content
      happens to run out of space, so a hub with short piece names could fit
      5+ per line while one with longer names fits 3. --submenu-cols (set
-     inline per hub, capped at 4 — see the Hub.astro frontmatter) fixes
+     inline per hub, capped at 6 — see the Hub.astro frontmatter) fixes
      exactly that many explicit column tracks; grid's own auto-placement
-     wraps anything past the 4th item onto a new row using those same
-     tracks, capping every hub at 4 per row regardless of label length.
+     wraps anything past the 6th item onto a new row using those same
+     tracks, capping every hub at 6 per row regardless of label length.
      justify-content:space-between then spreads those (auto-sized, not
      stretched) tracks across the row the same way the old flex layout did. */
   .hub__submenu {
-    --submenu-cols: 4;
+    --submenu-cols: 6;
     flex: 1 1 auto;
     display: grid;
     grid-template-columns: repeat(var(--submenu-cols), auto);
