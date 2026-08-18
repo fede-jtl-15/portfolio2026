@@ -1,6 +1,6 @@
 ---
 import '../styles/global.css';
-import { SITE, SECTIONS } from '../lib/site';
+import { SITE, SOCIALS, SECTIONS } from '../lib/site';
 
 interface Props {
   title?: string;
@@ -10,12 +10,38 @@ interface Props {
 }
 
 const { title, description = SITE.description, bare = false } = Astro.props;
-const pageTitle = title ? `${title} / ${SITE.name}` : `${SITE.name} / ${SITE.role}`;
+// The full-name form (SITE.fullName, not the lowercase-stylized SITE.name
+// used everywhere on-page) here on purpose — this is what search engines
+// actually display and match against a name search, unlike the visual
+// wordmark elsewhere on the site.
+const pageTitle = title ? `${title} / ${SITE.fullName}` : `${SITE.fullName} — ${SITE.role}`;
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
 const current = (href: string) =>
   (href === '/' ? path === '/' : path.startsWith(href)) ? 'page' : undefined;
+const canonicalUrl = new URL(Astro.url.pathname, SITE.url).toString();
+const ogImageUrl = new URL('/og-image.jpg', SITE.url).toString();
 
 const links = [...SECTIONS.map((s) => ({ href: `/${s.id}`, label: s.label })), { href: '/about', label: 'about' }];
+
+// Person structured data (schema.org/JSON-LD) — the single strongest
+// on-page signal for "this domain belongs to this specific person" in a
+// name search: sameAs ties this URL to the social profiles that already
+// rank, which is what search engines use to build a knowledge panel
+// rather than just trusting page text. Repeated on every page (cheap, a
+// few hundred bytes) rather than just the homepage, since any page could
+// be the one that actually gets indexed/shown first.
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE.fullName,
+  alternateName: SITE.name,
+  url: SITE.url,
+  image: ogImageUrl,
+  email: `mailto:${SITE.email}`,
+  jobTitle: SITE.role,
+  description: SITE.description,
+  sameAs: SOCIALS.map((s) => s.href),
+};
 ---
 
 <!doctype html>
@@ -25,9 +51,21 @@ const links = [...SECTIONS.map((s) => ({ href: `/${s.id}`, label: s.label })), {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content={SITE.fullName} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
     <link rel="icon" href="/favicon-32.png" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
@@ -49,6 +87,7 @@ const links = [...SECTIONS.map((s) => ({ href: `/${s.id}`, label: s.label })), {
         />
       )
     }
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
   </head>
 
   <body>

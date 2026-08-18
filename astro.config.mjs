@@ -1,9 +1,10 @@
 // @ts-check
+import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  // Change this to your real domain before deploying.
-  site: 'https://example.com',
+  site: 'https://federico-torres.com',
+  integrations: [sitemap()],
   markdown: {
     smartypants: true,
   },

@@ -1,9 +1,15 @@
 export const SITE = {
   name: 'federico torres',
+  // Properly-cased form for places search engines read as a name rather
+  // than a stylized wordmark — the <title> tag, meta/JSON-LD structured
+  // data (see Base.astro) — kept separate from `name` above since that one
+  // stays lowercase everywhere it's actually rendered on the page.
+  fullName: 'Federico Torres',
   role: 'sound, performance, audiovisual',
   description:
     'time-based media to explore abstraction focusing on the ephemeral and ever-changing nature of time and memory.',
   email: 'fede.jtl.torres.3@gmail.com',
+  url: 'https://federico-torres.com',
 };
 
 export const SOCIALS = [

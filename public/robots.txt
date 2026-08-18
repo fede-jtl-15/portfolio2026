@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://federico-torres.com/sitemap-index.xml
