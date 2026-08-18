@@ -111,8 +111,8 @@ _ live:
 	*mutek:
 		lineup: https://mutek.org/jp/news/final-lineup-for-the-first-hybrid-edition-of-mutek-mx-jp
 
-	* vj* 
-		+ seventhfield:
+	* vj
+		+ seventhfield: 
 		+ softblech: https://www.instagram.com/reel/Dbn46KQsldq/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==
 		+ md2: https://www.instagram.com/p/DVtj-adEfI2/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==
 		+ md1: https://www.instagram.com/reel/DQJlC7GiIsJ/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA==&igsi=MzRlODBiNWFlZA==
