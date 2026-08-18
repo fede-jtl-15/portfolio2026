@@ -604,5 +604,11 @@
     "width": null,
     "height": null,
     "sizeBytes": 10731176
+  },
+  "proyectos/sound/baladi/b17/b017_reel_v1.mp4": {
+    "url": "https://pub-1876799c7f29485a84a8bf990dbe521f.r2.dev/proyectos/sound/baladi/b17/b017_reel_v1.mp4",
+    "width": 1080,
+    "height": 1920,
+    "sizeBytes": 78238340
   }
 }
